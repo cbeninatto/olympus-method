@@ -60,10 +60,16 @@
     header {
         display: flex;
         flex-wrap: wrap;
-        align-items: baseline;
+        align-items: flex-end;
         justify-content: space-between;
         gap: 10px;
         margin-bottom: 14px;
+    }
+
+    .header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
 
     h1 {
@@ -89,6 +95,44 @@
         font-size: 0.85rem;
         color: var(--text-soft);
         opacity: 0.95;
+    }
+
+    .header-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+    }
+
+    .unit-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-soft);
+    }
+
+    .unit-toggle {
+        display: inline-flex;
+        background: #05070b;
+        border-radius: 999px;
+        padding: 3px;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .unit-toggle button {
+        border: none;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        background: transparent;
+        color: #e5e7eb;
+    }
+
+    .unit-toggle button.active {
+        background: var(--accent-green);
+        color: #020309;
+        font-weight: 600;
     }
 
     /* Tabs */
@@ -187,7 +231,7 @@
         letter-spacing: 0.06em;
     }
 
-    select, input[type="number"], textarea {
+    select, input[type="number"], input[type="date"], textarea {
         width: 100%;
         padding: 8px 10px;
         font-size: 0.9rem;
@@ -199,7 +243,7 @@
         resize: vertical;
     }
 
-    select:focus, input[type="number"]:focus, textarea:focus {
+    select:focus, input[type="number"]:focus, input[type="date"]:focus, textarea:focus {
         border-color: var(--accent-green);
         box-shadow: 0 0 0 1px rgba(42,255,128,0.4);
     }
@@ -210,6 +254,10 @@
         margin: 0;
     }
 
+    input[type="date"] {
+        padding-right: 30px;
+    }
+
     .row {
         display: flex;
         gap: 10px;
@@ -217,30 +265,6 @@
 
     .row > div {
         flex: 1;
-    }
-
-    .unit-toggle {
-        display: inline-flex;
-        background: #05070b;
-        border-radius: 999px;
-        padding: 3px;
-        border: 1px solid var(--border-subtle);
-    }
-
-    .unit-toggle button {
-        border: none;
-        padding: 6px 14px;
-        border-radius: 999px;
-        font-size: 0.8rem;
-        cursor: pointer;
-        background: transparent;
-        color: #e5e7eb;
-    }
-
-    .unit-toggle button.active {
-        background: var(--accent-green);
-        color: #020309;
-        font-weight: 600;
     }
 
     .btn-main {
@@ -358,13 +382,6 @@
         margin-top: 10px;
     }
 
-    .footer-note {
-        margin-top: 14px;
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        opacity: 0.9;
-    }
-
     .template-hint {
         margin-top: 4px;
         font-size: 0.75rem;
@@ -374,22 +391,6 @@
     .template-hint span {
         color: var(--accent-green);
         font-weight: 600;
-    }
-
-    .chip-row {
-        margin-top: 6px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        font-size: 0.7rem;
-    }
-
-    .chip {
-        padding: 3px 9px;
-        border-radius: 999px;
-        background: rgba(15,23,42,0.9);
-        border: 1px solid rgba(148,163,184,0.4);
-        color: var(--text-soft);
     }
 
     .subsection-title {
@@ -466,12 +467,6 @@
         color: var(--text-soft);
     }
 
-    .exercise-last span {
-        color: var(--accent-green);
-        cursor: pointer;
-        text-decoration: underline dotted;
-    }
-
     .exercise-body {
         padding: 8px 10px 10px;
         border-top: 1px solid rgba(31,41,55,0.9);
@@ -526,18 +521,6 @@
         min-height: 40px;
     }
 
-    .exercise-actions-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-        margin-top: 10px;
-    }
-
-    .exercise-actions-row .btn-ghost {
-        flex: 1;
-        text-align: center;
-    }
-
     .day-save-row {
         margin-top: 12px;
         display: flex;
@@ -554,6 +537,22 @@
 
     .add-exercise-inline input {
         flex: 1;
+        padding: 8px 10px;
+        font-size: 0.9rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-subtle);
+        background: var(--bg-card-soft);
+        color: var(--text-main);
+    }
+
+    .add-exercise-inline input::placeholder {
+        color: var(--text-soft);
+    }
+
+    .add-exercise-inline input:focus {
+        border-color: var(--accent-green);
+        box-shadow: 0 0 0 1px rgba(42,255,128,0.4);
+        outline: none;
     }
 
     /* Timer footer */
@@ -567,8 +566,8 @@
         border-radius: 12px;
         border: 1px solid rgba(148,163,184,0.7);
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        gap: 6px;
         cursor: pointer;
         transition: all 0.15s ease-out;
     }
@@ -577,16 +576,12 @@
         display: none;
     }
 
-    .timer-footer .timer-summary {
+    .timer-summary {
         display: flex;
         justify-content: space-between;
         width: 100%;
         gap: 10px;
         align-items: center;
-    }
-
-    .timer-footer.collapsed .timer-summary-main {
-        font-size: 0.85rem;
     }
 
     .timer-summary-main {
@@ -614,10 +609,10 @@
     }
 
     .timer-expanded {
-        margin-top: 8px;
         display: flex;
         gap: 16px;
         width: 100%;
+        margin-top: 4px;
     }
 
     .timer-block {
@@ -695,13 +690,20 @@
 
 <div class="app">
     <header>
-        <div>
+        <div class="header-left">
             <h1>
                 Olympus Method
                 <span class="logo-pill">Heavy Duty</span>
             </h1>
             <div class="tagline">
                 High-intensity warm-ups, timers, and a full 3-day Push / Legs / Pull log — tuned for real gym use.
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="unit-label">Unit</div>
+            <div class="unit-toggle">
+                <button type="button" id="kgBtn">kg</button>
+                <button type="button" id="lbBtn">lb</button>
             </div>
         </div>
     </header>
@@ -729,17 +731,34 @@
             <div class="card">
                 <h2>
                     Lift Setup
-                    <span class="badge">Input</span>
+                    <span class="badge">Warm-Ups</span>
                 </h2>
 
                 <label for="liftSelect">Lift</label>
                 <select id="liftSelect">
+                    <!-- Core big lifts -->
                     <option value="bench">Bench Press</option>
-                    <option value="squat">Back Squat</option>
+                    <option value="incline_bench">Incline Barbell Bench Press</option>
+                    <option value="flat_bench">Flat Barbell Bench Press</option>
+                    <option value="squat">Barbell Back Squat</option>
                     <option value="deadlift">Deadlift</option>
+                    <option value="rdl">Romanian Deadlift</option>
                     <option value="ohp">Overhead Press</option>
-                    <option value="row">Barbell Row</option>
-                    <option value="pullups">Pull-Ups (weighted)</option>
+                    <option value="row">Bent-Over Barbell Row</option>
+                    <option value="pullups">Weighted Pull-Ups</option>
+                    <!-- Other split exercises -->
+                    <option value="weighted_dips">Weighted Dips (Chest-focused)</option>
+                    <option value="lat_raise">Dumbbell Lateral Raises</option>
+                    <option value="triceps_pushdown">Rope Triceps Pushdown</option>
+                    <option value="skull_crushers">Skull Crushers</option>
+                    <option value="ham_curl">Hamstring Curl (Machine)</option>
+                    <option value="calf_raises">Calf Raises</option>
+                    <option value="leg_press">Leg Press (Optional)</option>
+                    <option value="hack_squat">Hack Squat (Optional)</option>
+                    <option value="biceps_curl">Barbell Biceps Curl</option>
+                    <option value="rear_delt">Rear Delt Flys</option>
+                    <option value="shrugs">Barbell Shrugs</option>
+                    <!-- Custom -->
                     <option value="custom">Custom / Other</option>
                 </select>
 
@@ -749,25 +768,18 @@
                         <input type="number" id="workingWeight" placeholder="e.g. 100" step="0.5" min="0" inputmode="decimal" />
                     </div>
                     <div>
-                        <label>Unit</label>
-                        <div class="unit-toggle">
-                            <button type="button" id="kgBtn" class="active">kg</button>
-                            <button type="button" id="lbBtn">lb</button>
-                        </div>
+                        <label for="barWeight">Bar Weight</label>
+                        <input type="number" id="barWeight" placeholder="20 for kg / 45 for lb" step="0.5" min="0" inputmode="decimal" />
                     </div>
                 </div>
 
                 <div class="row">
                     <div>
-                        <label for="barWeight">Bar Weight</label>
-                        <input type="number" id="barWeight" placeholder="20 for kg / 45 for lb" step="0.5" min="0" inputmode="decimal" />
-                    </div>
-                    <div>
                         <label for="templateSelect">Warm-Up Template</label>
                         <select id="templateSelect">
-                            <option value="heavyDuty">Heavy Duty (30% & 50%)</option>
+                            <option value="soviet">Soviet Strength</option>
                             <option value="mentzer">Mike Mentzer</option>
-                            <option value="twoWarmups">2 Warm-Ups Only</option>
+                            <option value="olympus">Olympus Method</option>
                         </select>
                     </div>
                 </div>
@@ -775,34 +787,12 @@
                 <div class="template-hint" id="templateHint"></div>
 
                 <button class="btn-main" id="calcBtn">Calculate Warm-Ups & Plates</button>
-
-                <div class="subsection-title">Log Top Set</div>
-
-                <div class="row">
-                    <div>
-                        <label for="actualReps">Actual Reps (top set)</label>
-                        <input type="number" id="actualReps" placeholder="e.g. 8" min="0" step="1" inputmode="numeric" />
-                    </div>
-                </div>
-
-                <button class="btn-secondary" id="saveSessionBtn">
-                    Save Session & Show Progression
-                </button>
-
-                <div class="chip-row">
-                    <div class="chip">Warm-ups only on first big lift of the day</div>
-                    <div class="chip">Accessories: go straight to working set</div>
-                </div>
-
-                <div class="footer-note">
-                    Heavy Duty flow: 2 short warm-ups, 1 all-out set to failure (6–10 reps).
-                </div>
             </div>
 
             <!-- RIGHT: Results -->
             <div class="card">
                 <h2>
-                    Warm-Ups, Plates & Progression
+                    Warm-Ups & Plates
                     <span class="badge">Output</span>
                 </h2>
 
@@ -821,11 +811,8 @@
                 </table>
 
                 <div class="empty-note" id="emptyNote">
-                    Enter working weight & bar, choose template, then tap <strong>Calculate</strong>.
+                    Enter working weight & bar, choose your template, then tap <strong>Calculate</strong>.
                 </div>
-
-                <div id="previousStats" class="empty-note" style="display:none;"></div>
-                <div id="suggestionText" class="empty-note" style="display:none;"></div>
             </div>
         </div>
     </section>
@@ -838,7 +825,10 @@
                 <span class="badge">Chest / Shoulders / Triceps</span>
             </h2>
 
-            <p class="subsection-title" style="margin-top:4px;">Exercises</p>
+            <label class="subsection-title" style="margin-top:10px;">Workout Date</label>
+            <input type="date" class="workout-date" data-day="push" />
+
+            <p class="subsection-title" style="margin-top:10px;">Exercises</p>
             <div class="exercise-list" id="pushExercises"></div>
 
             <div class="add-exercise-inline">
@@ -859,7 +849,11 @@
                 Day 2 — Legs
                 <span class="badge">Quads / Hams / Calves</span>
             </h2>
-            <p class="subsection-title" style="margin-top:4px;">Exercises</p>
+
+            <label class="subsection-title" style="margin-top:10px;">Workout Date</label>
+            <input type="date" class="workout-date" data-day="legs" />
+
+            <p class="subsection-title" style="margin-top:10px;">Exercises</p>
             <div class="exercise-list" id="legsExercises"></div>
 
             <div class="add-exercise-inline">
@@ -880,7 +874,11 @@
                 Day 3 — Pull
                 <span class="badge">Back / Rear Delts / Biceps</span>
             </h2>
-            <p class="subsection-title" style="margin-top:4px;">Exercises</p>
+
+            <label class="subsection-title" style="margin-top:10px;">Workout Date</label>
+            <input type="date" class="workout-date" data-day="pull" />
+
+            <p class="subsection-title" style="margin-top:10px;">Exercises</p>
             <div class="exercise-list" id="pullExercises"></div>
 
             <div class="add-exercise-inline">
@@ -917,13 +915,14 @@
                 <div class="timer-label">Rest Timer</div>
                 <div class="timer-display" id="restDisplay">00s</div>
                 <div class="rest-presets">
-                    <button class="timer-btn rest-preset" data-sec="60">60s</button>
-                    <button class="timer-btn rest-preset" data-sec="90">90s</button>
-                    <button class="timer-btn rest-preset" data-sec="120">120s</button>
+                    <button class="timer-btn rest-preset" data-sec="60">1 min</button>
+                    <button class="timer-btn rest-preset" data-sec="120">2 min</button>
+                    <button class="timer-btn rest-preset" data-sec="300">5 min</button>
                 </div>
                 <div class="timer-controls">
                     <button class="timer-btn primary" id="restStartPause">Start</button>
                     <button class="timer-btn" id="restReset">Reset</button>
+                    <button class="timer-btn" id="restPlus30">+30s</button>
                 </div>
             </div>
         </div>
@@ -947,73 +946,10 @@
         });
     });
 
-    // ---- Warm-up logic / calculator ----
-    const TEMPLATES = {
-        heavyDuty: {
-            name: "Heavy Duty (30% & 50%)",
-            description: "30% x 5, 50% x 3–5, then 100% x 6–10 to failure.",
-            sets: [
-                { type: "Warm-up", percent: 0.30, reps: "5" },
-                { type: "Warm-up", percent: 0.50, reps: "3–5" },
-                { type: "Working", percent: 1.00, reps: "6–10 (to failure)" }
-            ]
-        },
-        mentzer: {
-            name: "Mike Mentzer",
-            description: "50% x 6–8, 75% x 3–4, 100% x 6–10 to failure.",
-            sets: [
-                { type: "Warm-up", percent: 0.50, reps: "6–8" },
-                { type: "Warm-up", percent: 0.75, reps: "3–4" },
-                { type: "Working", percent: 1.00, reps: "6–10 (to failure)" }
-            ]
-        },
-        twoWarmups: {
-            name: "2 Warm-Ups Only",
-            description: "40% x 5, 70% x 2–3, then 100% working set.",
-            sets: [
-                { type: "Warm-up", percent: 0.40, reps: "5" },
-                { type: "Warm-up", percent: 0.70, reps: "2–3" },
-                { type: "Working", percent: 1.00, reps: "6–10 (to failure)" }
-            ]
-        }
-    };
-
-    const KG_PLATES = [25, 20, 15, 10, 5, 2.5, 1.25];
-    const LB_PLATES = [45, 35, 25, 10, 5, 2.5];
-
+    // ---- Global unit toggle ----
     let currentUnit = "kg";
-
-    const liftSelect = document.getElementById("liftSelect");
-    const workingWeightInput = document.getElementById("workingWeight");
-    const barWeightInput = document.getElementById("barWeight");
-    const templateSelect = document.getElementById("templateSelect");
-    const templateHint = document.getElementById("templateHint");
-    const resultsTable = document.getElementById("resultsTable");
-    const resultsBody = document.getElementById("resultsBody");
-    const emptyNote = document.getElementById("emptyNote");
     const kgBtn = document.getElementById("kgBtn");
     const lbBtn = document.getElementById("lbBtn");
-    const calcBtn = document.getElementById("calcBtn");
-    const saveSessionBtn = document.getElementById("saveSessionBtn");
-    const actualRepsInput = document.getElementById("actualReps");
-    const previousStatsDiv = document.getElementById("previousStats");
-    const suggestionTextDiv = document.getElementById("suggestionText");
-
-    function updateTemplateHint() {
-        const tKey = templateSelect.value;
-        const t = TEMPLATES[tKey];
-        if (!t) {
-            templateHint.textContent = "";
-            return;
-        }
-        templateHint.innerHTML = `<span>${t.name}:</span> ${t.description}`;
-    }
-
-    templateSelect.addEventListener("change", updateTemplateHint);
-    updateTemplateHint();
-
-    kgBtn.addEventListener("click", () => setUnit("kg"));
-    lbBtn.addEventListener("click", () => setUnit("lb"));
 
     function setUnit(unit) {
         currentUnit = unit;
@@ -1027,6 +963,65 @@
             if (!barWeightInput.value) barWeightInput.value = 45;
         }
     }
+
+    kgBtn.addEventListener("click", () => setUnit("kg"));
+    lbBtn.addEventListener("click", () => setUnit("lb"));
+
+    // ---- Warm-up logic / calculator ----
+    const TEMPLATES = {
+        soviet: {
+            name: "Soviet Strength",
+            description: "40% x 5, 70% x 2–3, then 100% working set.",
+            sets: [
+                { type: "Warm-up", percent: 0.40, reps: "5" },
+                { type: "Warm-up", percent: 0.70, reps: "2–3" },
+                { type: "Working", percent: 1.00, reps: "6–10 (to failure)" }
+            ]
+        },
+        mentzer: {
+            name: "Mike Mentzer",
+            description: "50% x 6–8, 75% x 3–4, 100% x 6–10 to failure.",
+            sets: [
+                { type: "Warm-up", percent: 0.50, reps: "6–8" },
+                { type: "Warm-up", percent: 0.75, reps: "3–4" },
+                { type: "Working", percent: 1.00, reps: "6–10 (to failure)" }
+            ]
+        },
+        olympus: {
+            name: "Olympus Method",
+            description: "30% x 5, 50% x 3–5, then 100% x 6–10 to failure.",
+            sets: [
+                { type: "Warm-up", percent: 0.30, reps: "5" },
+                { type: "Warm-up", percent: 0.50, reps: "3–5" },
+                { type: "Working", percent: 1.00, reps: "6–10 (to failure)" }
+            ]
+        }
+    };
+
+    const KG_PLATES = [25, 20, 15, 10, 5, 2.5, 1.25];
+    const LB_PLATES = [45, 35, 25, 10, 5, 2.5];
+
+    const workingWeightInput = document.getElementById("workingWeight");
+    const barWeightInput = document.getElementById("barWeight");
+    const templateSelect = document.getElementById("templateSelect");
+    const templateHint = document.getElementById("templateHint");
+    const resultsTable = document.getElementById("resultsTable");
+    const resultsBody = document.getElementById("resultsBody");
+    const emptyNote = document.getElementById("emptyNote");
+    const calcBtn = document.getElementById("calcBtn");
+
+    function updateTemplateHint() {
+        const tKey = templateSelect.value;
+        const t = TEMPLATES[tKey];
+        if (!t) {
+            templateHint.textContent = "";
+            return;
+        }
+        templateHint.innerHTML = `<span>${t.name}:</span> ${t.description}`;
+    }
+
+    templateSelect.addEventListener("change", updateTemplateHint);
+    updateTemplateHint();
 
     function formatWeight(value) {
         if (!isFinite(value)) return "-";
@@ -1110,134 +1105,8 @@
 
     calcBtn.addEventListener("click", calculateWarmups);
 
-    // LocalStorage log (calculator)
-    const LOG_KEY = "olympusLogs_v1";
-    const LAST_WEIGHT_KEY = "olympusLastWeights_v1"; // for exercise suggestions
+    // ---- Day logs ----
     const DAY_LOG_KEY = "olympusDayLogs_v1";
-
-    function loadLogs() {
-        try {
-            const raw = localStorage.getItem(LOG_KEY);
-            return raw ? JSON.parse(raw) : [];
-        } catch {
-            return [];
-        }
-    }
-
-    function saveLogs(logs) {
-        localStorage.setItem(LOG_KEY, JSON.stringify(logs));
-    }
-
-    function loadLastWeights() {
-        try {
-            const raw = localStorage.getItem(LAST_WEIGHT_KEY);
-            return raw ? JSON.parse(raw) : {};
-        } catch {
-            return {};
-        }
-    }
-
-    function saveLastWeights(map) {
-        localStorage.setItem(LAST_WEIGHT_KEY, JSON.stringify(map));
-    }
-
-    function getIncrement(unit) {
-        return unit === "kg" ? 2.5 : 5;
-    }
-
-    function suggestNextWeight(weight, reps, unit) {
-        const inc = getIncrement(unit);
-        if (reps >= 10) return weight + inc;
-        if (reps <= 5) return Math.max(0, weight - inc);
-        return weight;
-    }
-
-    function formatDateShort(iso) {
-        const d = new Date(iso);
-        return d.toLocaleDateString(undefined, { day: "2-digit", month: "2-digit" });
-    }
-
-    function updateProgressSection(lift, unit) {
-        const logs = loadLogs().filter(l => l.lift === lift && l.unit === unit);
-
-        if (logs.length < 2) {
-            previousStatsDiv.style.display = "block";
-            previousStatsDiv.textContent = "Not enough history yet.";
-            suggestionTextDiv.style.display = "none";
-            return;
-        }
-
-        logs.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        const prev = logs[logs.length - 2];
-        const curr = logs[logs.length - 1];
-
-        previousStatsDiv.style.display = "block";
-        previousStatsDiv.innerHTML =
-            `Last session: <strong>${formatWeight(prev.weight)} ${unit} × ${prev.reps}</strong> on ${formatDateShort(prev.date)}<br>` +
-            `Today: <strong>${formatWeight(curr.weight)} ${unit} × ${curr.reps}</strong>`;
-
-        const suggested = suggestNextWeight(curr.weight, curr.reps, unit);
-
-        suggestionTextDiv.style.display = "block";
-        suggestionTextDiv.innerHTML = `Next target: <strong>${formatWeight(suggested)} ${unit}</strong>`;
-    }
-
-    function saveSession() {
-        const weight = parseFloat(workingWeightInput.value);
-        const reps = parseInt(actualRepsInput.value, 10);
-        const lift = liftSelect.value;
-
-        if (!isFinite(weight) || weight <= 0) return alert("Enter weight");
-        if (!reps || reps <= 0) return alert("Enter reps");
-
-        const logs = loadLogs();
-        logs.push({
-            lift,
-            unit: currentUnit,
-            weight,
-            reps,
-            date: new Date().toISOString()
-        });
-
-        saveLogs(logs);
-        updateProgressSection(lift, currentUnit);
-
-        alert("Session saved!");
-    }
-
-    saveSessionBtn.addEventListener("click", saveSession);
-
-    // ---- Exercise logging per day ----
-    const DEFAULT_SPLIT = {
-        push: [
-            "Incline Barbell Bench Press",
-            "Flat Barbell Bench Press",
-            "Weighted Dips (Chest-focused)",
-            "Dumbbell Lateral Raises",
-            "Rope Pushdown / Skull Crushers"
-        ],
-        legs: [
-            "Barbell Back Squat",
-            "Romanian Deadlift",
-            "Hamstring Curl (Machine)",
-            "Calf Raises",
-            "Leg Press / Hack Squat"
-        ],
-        pull: [
-            "Weighted Pull-Ups",
-            "Bent-Over Barbell Row",
-            "Barbell Biceps Curl",
-            "Rear Delt Flys",
-            "Barbell Shrugs"
-        ]
-    };
-
-    const DAY_CONTAINERS = {
-        push: document.getElementById("pushExercises"),
-        legs: document.getElementById("legsExercises"),
-        pull: document.getElementById("pullExercises")
-    };
 
     function loadDayLogs() {
         try {
@@ -1252,6 +1121,60 @@
         localStorage.setItem(DAY_LOG_KEY, JSON.stringify(logs));
     }
 
+    function getLastDayDate(dayKey) {
+        const logs = loadDayLogs();
+        for (let i = logs.length - 1; i >= 0; i--) {
+            if (logs[i].day === dayKey && logs[i].date) {
+                return logs[i].date;
+            }
+        }
+        return null;
+    }
+
+    function getLastExerciseLog(dayKey, exName) {
+        const logs = loadDayLogs();
+        for (let i = logs.length - 1; i >= 0; i--) {
+            const log = logs[i];
+            if (log.day !== dayKey || !Array.isArray(log.exercises)) continue;
+            const ex = log.exercises.find(e => e.name === exName);
+            if (ex && ex.sets && ex.sets.length > 0) {
+                return ex;
+            }
+        }
+        return null;
+    }
+
+    const DAY_CONTAINERS = {
+        push: document.getElementById("pushExercises"),
+        legs: document.getElementById("legsExercises"),
+        pull: document.getElementById("pullExercises")
+    };
+
+    const DEFAULT_SPLIT = {
+        push: [
+            "Incline Barbell Bench Press",
+            "Flat Barbell Bench Press",
+            "Weighted Dips (Chest-focused)",
+            "Dumbbell Lateral Raises",
+            "Rope Pushdown / Skull Crushers"
+        ],
+        legs: [
+            "Barbell Back Squat",
+            "Romanian Deadlift",
+            "Hamstring Curl (Machine)",
+            "Calf Raises",
+            "Leg Press (Optional)",
+            "Hack Squat (Optional)"
+        ],
+        pull: [
+            "Weighted Pull-Ups",
+            "Bent-Over Barbell Row",
+            "Barbell Biceps Curl",
+            "Rear Delt Flys",
+            "Barbell Shrugs"
+        ]
+    };
+
     function escapeHtml(str) {
         return str.replace(/[&<>"']/g, function (c) {
             return ({
@@ -1264,7 +1187,7 @@
         });
     }
 
-    // Add set row with 2 sets initial, numeric UX
+    // Add set row; returns the row element
     function addSetRow(card, autoFocusWeight = true) {
         const container = card.querySelector(".sets-container");
         const index = container.children.length + 1;
@@ -1281,8 +1204,8 @@
         const weightInput = row.querySelector(".set-weight");
         const repsInput = row.querySelector(".set-reps");
         const removeBtn = row.querySelector(".remove-set-btn");
+        const dayKey = card.dataset.dayKey;
 
-        // Keyboard UX
         if (autoFocusWeight) {
             weightInput.focus();
         }
@@ -1300,26 +1223,31 @@
                 const label = r.querySelector(".set-label");
                 if (label) label.textContent = `Set ${i + 1}`;
             });
-            autoSaveDayLog(card.dataset.dayKey);
+            autoSaveDayLog(dayKey);
         });
 
-        // auto-save on changes
-        weightInput.addEventListener("input", () => autoSaveDayLog(card.dataset.dayKey));
-        repsInput.addEventListener("input", () => autoSaveDayLog(card.dataset.dayKey));
+        weightInput.addEventListener("input", () => autoSaveDayLog(dayKey));
+        repsInput.addEventListener("input", () => autoSaveDayLog(dayKey));
+
+        return row;
     }
 
-    function createExerciseCard(dayKey, name, suggestionMap) {
+    function createExerciseCard(dayKey, name) {
         const container = DAY_CONTAINERS[dayKey];
         if (!container) return;
-
-        const key = name.trim();
-        const lastWeights = suggestionMap || loadLastWeights();
-        const last = lastWeights[key];
 
         const card = document.createElement("div");
         card.className = "exercise-card";
         card.setAttribute("draggable", "true");
         card.dataset.dayKey = dayKey;
+
+        const lastLog = getLastExerciseLog(dayKey, name);
+
+        let lastSummary = "";
+        if (lastLog && lastLog.sets && lastLog.sets.length > 0) {
+            const s = lastLog.sets[lastLog.sets.length - 1];
+            lastSummary = `Last: ${formatWeight(s.weight)} ${currentUnit} × ${s.reps}`;
+        }
 
         card.innerHTML = `
             <div class="exercise-header">
@@ -1327,15 +1255,12 @@
                     <button type="button" class="exercise-toggle">▼</button>
                     <div class="exercise-name-block">
                         <span class="exercise-name">${escapeHtml(name)}</span>
-                        <span class="exercise-last">
-                            ${last ? `Last: <span data-ex-name="${escapeHtml(name)}">${formatWeight(last.weight)} ${last.unit}</span>` : ""}
-                        </span>
+                        <span class="exercise-last">${lastSummary}</span>
                     </div>
                 </div>
             </div>
             <div class="exercise-body">
                 <div class="sets-container"></div>
-                <button type="button" class="btn-ghost add-set-btn">+ Add Set</button>
                 <label class="notes-label">Notes</label>
                 <textarea class="exercise-notes" rows="2" placeholder="Notes, RPE, technique..."></textarea>
             </div>
@@ -1344,7 +1269,7 @@
         const body = card.querySelector(".exercise-body");
         const toggleBtn = card.querySelector(".exercise-toggle");
 
-        // All expanded by default (your choice 1D)
+        // Expanded by default
         body.classList.remove("collapsed");
         toggleBtn.textContent = "▼";
 
@@ -1361,31 +1286,22 @@
             toggleBtn.textContent = collapsed ? "▶" : "▼";
         });
 
-        const addSetBtn = card.querySelector(".add-set-btn");
-        addSetBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            addSetRow(card, true);
-            autoSaveDayLog(dayKey);
-        });
+        // Prefill sets from last workout (Option A)
+        if (lastLog && lastLog.sets && lastLog.sets.length > 0) {
+            lastLog.sets.forEach(set => {
+                const row = addSetRow(card, false);
+                row.querySelector(".set-weight").value = set.weight;
+                row.querySelector(".set-reps").value = set.reps;
+            });
+        } else {
+            // Default to 2 blank sets
+            addSetRow(card, false);
+            addSetRow(card, false);
+        }
 
         // Notes auto-save
         const notes = card.querySelector(".exercise-notes");
         notes.addEventListener("input", () => autoSaveDayLog(dayKey));
-
-        // Suggest last weight (click to insert into first empty set)
-        const lastSpan = card.querySelector(".exercise-last span[data-ex-name]");
-        if (lastSpan) {
-            lastSpan.addEventListener("click", (e) => {
-                const sets = card.querySelectorAll(".set-row .set-weight");
-                for (let i = 0; i < sets.length; i++) {
-                    if (!sets[i].value) {
-                        sets[i].value = last.weight;
-                        autoSaveDayLog(dayKey);
-                        break;
-                    }
-                }
-            });
-        }
 
         // Drag & drop
         card.addEventListener("dragstart", (e) => {
@@ -1398,22 +1314,17 @@
         });
 
         container.appendChild(card);
-
-        // Preload 2 sets (your choice 2C)
-        addSetRow(card, false);
-        addSetRow(card, false);
     }
 
     function initDefaultExercises() {
-        const suggestions = loadLastWeights();
         ["push", "legs", "pull"].forEach(dayKey => {
-            DEFAULT_SPLIT[dayKey].forEach(name => createExerciseCard(dayKey, name, suggestions));
+            DEFAULT_SPLIT[dayKey].forEach(name => createExerciseCard(dayKey, name));
         });
     }
 
     initDefaultExercises();
 
-    // Drag & drop handling (simple vertical reorder)
+    // Drag & drop handling
     Object.keys(DAY_CONTAINERS).forEach(dayKey => {
         const list = DAY_CONTAINERS[dayKey];
 
@@ -1472,6 +1383,21 @@
     setupAddExercise("legs", "legsAddInput", "legsAddBtn");
     setupAddExercise("pull", "pullAddInput", "pullAddBtn");
 
+    // Workout dates init
+    document.querySelectorAll(".workout-date").forEach(input => {
+        const day = input.dataset.day;
+        const last = getLastDayDate(day);
+        if (last) {
+            input.value = last.slice(0, 10);
+        } else {
+            input.value = new Date().toISOString().slice(0, 10);
+        }
+
+        input.addEventListener("change", () => {
+            autoSaveDayLog(day);
+        });
+    });
+
     // Save day log (manual & auto)
     document.querySelectorAll(".save-day-btn").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -1484,10 +1410,18 @@
         const container = DAY_CONTAINERS[dayKey];
         if (!container) return null;
 
+        const dateInput = document.querySelector(`.workout-date[data-day="${dayKey}"]`);
+        let dateIso;
+        if (dateInput && dateInput.value) {
+            dateIso = new Date(dateInput.value + "T00:00:00").toISOString();
+        } else {
+            dateIso = new Date().toISOString();
+        }
+
         const cards = container.querySelectorAll(".exercise-card");
         const log = {
             day: dayKey,
-            date: new Date().toISOString(),
+            date: dateIso,
             exercises: []
         };
 
@@ -1520,16 +1454,6 @@
         logs.push(log);
         saveDayLogs(logs);
 
-        // update last weights suggestion map
-        const lastMap = loadLastWeights();
-        log.exercises.forEach(ex => {
-            if (ex.sets && ex.sets.length > 0) {
-                const lastSet = ex.sets[ex.sets.length - 1];
-                lastMap[ex.name.trim()] = { weight: lastSet.weight, unit: currentUnit };
-            }
-        });
-        saveLastWeights(lastMap);
-
         if (!silent) {
             const label = dayKey === "push" ? "Day 1" : dayKey === "legs" ? "Day 2" : "Day 3";
             alert(label + " log saved!");
@@ -1555,6 +1479,7 @@
     const restStartPauseBtn = document.getElementById("restStartPause");
     const restResetBtn = document.getElementById("restReset");
     const restPresetBtns = document.querySelectorAll(".rest-preset");
+    const restPlus30Btn = document.getElementById("restPlus30");
     const timerFooter = document.getElementById("timerFooter");
     const timerChevron = document.getElementById("timerChevron");
 
@@ -1602,8 +1527,8 @@
     updateWorkoutDisplay();
 
     // Rest timer
-    let restDuration = 90;
-    let restRemaining = 90;
+    let restDuration = 60;
+    let restRemaining = 60;
     let restInterval = null;
     let restRunning = false;
 
@@ -1621,6 +1546,13 @@
             restRemaining = sec;
             updateRestDisplay();
         });
+    });
+
+    restPlus30Btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        restRemaining += 30;
+        restDuration = restRemaining;
+        updateRestDisplay();
     });
 
     function playBeep() {
@@ -1666,7 +1598,6 @@
                     restRunning = false;
                     restStartPauseBtn.textContent = "Start";
                     updateRestDisplay();
-                    // Option D: sound + vibration + flash
                     playBeep();
                     vibratePattern();
                     flashEffect();
