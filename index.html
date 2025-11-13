@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Olympus Method — Warm-Up & Log</title>
 
-<!-- Optional: Inter font -->
+<!-- Inter font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -40,9 +40,10 @@
         margin: 0 auto;
         background: rgba(10, 14, 18, 0.95);
         border-radius: 20px;
-        padding: 20px 20px 24px;
+        padding: 20px 20px 64px; /* extra bottom for footer */
         box-shadow: 0 18px 40px rgba(0,0,0,0.6);
         border: 1px solid rgba(233,196,106,0.18);
+        position: relative;
     }
 
     header {
@@ -160,7 +161,7 @@
         letter-spacing: 0.06em;
     }
 
-    select, input[type="number"] {
+    select, input[type="number"], textarea {
         width: 100%;
         padding: 8px 10px;
         font-size: 0.9rem;
@@ -169,9 +170,10 @@
         background: #0b1114;
         color: #f9fafb;
         outline: none;
+        resize: vertical;
     }
 
-    select:focus, input[type="number"]:focus {
+    select:focus, input[type="number"]:focus, textarea:focus {
         border-color: var(--az-accent);
         box-shadow: 0 0 0 1px rgba(42,157,143,0.7);
     }
@@ -248,6 +250,21 @@
     }
 
     .btn-secondary:hover {
+        border-color: var(--az-accent);
+    }
+
+    .btn-ghost {
+        border-radius: 999px;
+        padding: 6px 12px;
+        border: 1px dashed rgba(148,163,184,0.5);
+        background: transparent;
+        color: #e5e7eb;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+
+    .btn-ghost:hover {
+        border-style: solid;
         border-color: var(--az-accent);
     }
 
@@ -352,35 +369,201 @@
         opacity: 0.9;
     }
 
-    /* Split tabs styling */
-    .day-title {
-        font-size: 1.05rem;
-        margin: 0 0 4px;
+    /* Exercise cards */
+    .exercise-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 6px;
     }
 
-    .day-subtitle {
-        font-size: 0.85rem;
+    .exercise-card {
+        background: rgba(15,23,42,0.9);
+        border-radius: 10px;
+        border: 1px solid rgba(148,163,184,0.4);
+        overflow: hidden;
+    }
+
+    .exercise-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
+        cursor: pointer;
+        background: radial-gradient(circle at top left, rgba(244,162,97,0.12), rgba(15,23,42,0.95));
+    }
+
+    .exercise-header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .exercise-toggle {
+        border: none;
+        background: rgba(15,23,42,0.9);
         color: #e5e7eb;
-        opacity: 0.9;
-        margin-bottom: 10px;
+        border-radius: 999px;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        cursor: pointer;
     }
 
-    .split-list {
-        padding-left: 18px;
-        margin-top: 4px;
-        margin-bottom: 4px;
+    .exercise-name {
+        font-size: 0.9rem;
+        font-weight: 600;
     }
 
-    .split-list li {
+    .exercise-body {
+        padding: 8px 10px 10px;
+        border-top: 1px solid rgba(31,41,55,0.8);
+    }
+
+    .exercise-body.collapsed {
+        display: none;
+    }
+
+    .sets-container {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
         margin-bottom: 6px;
     }
 
-    hr.split-divider {
-        border: none;
-        border-top: 1px dashed rgba(148,163,184,0.4);
-        margin: 10px 0;
+    .set-row {
+        display: grid;
+        grid-template-columns: auto minmax(0,1fr) minmax(0,1fr) auto;
+        gap: 6px;
+        align-items: center;
     }
 
+    .set-label {
+        font-size: 0.75rem;
+        color: #e5e7eb;
+        opacity: 0.9;
+    }
+
+    .set-row input {
+        width: 100%;
+    }
+
+    .remove-set-btn {
+        border: none;
+        background: transparent;
+        color: #fca5a5;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0 4px;
+    }
+
+    .notes-label {
+        margin-top: 6px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+    }
+
+    .exercise-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .exercise-actions .btn-ghost {
+        flex: 1;
+        text-align: center;
+    }
+
+    /* Day save */
+    .day-save-row {
+        margin-top: 10px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    /* Timer footer */
+    .timer-footer {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        margin-top: 18px;
+        padding: 8px 10px;
+        background: rgba(15,23,42,0.97);
+        border-radius: 12px;
+        border: 1px solid rgba(148,163,184,0.6);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .timer-block {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+    }
+
+    .timer-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #e5e7eb;
+        opacity: 0.9;
+    }
+
+    .timer-display {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .timer-controls {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .timer-btn {
+        border-radius: 999px;
+        padding: 4px 10px;
+        border: 1px solid rgba(148,163,184,0.7);
+        background: rgba(15,23,42,0.9);
+        color: #e5e7eb;
+        font-size: 0.75rem;
+        cursor: pointer;
+    }
+
+    .timer-btn.primary {
+        border-color: var(--az-accent);
+    }
+
+    .timer-btn:hover {
+        border-color: var(--az-accent);
+    }
+
+    .rest-presets {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        margin-top: 2px;
+    }
+
+    .rest-presets .timer-btn {
+        padding: 3px 8px;
+    }
+
+    @media (max-width: 700px) {
+        .timer-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
 </style>
 </head>
 <body>
@@ -393,7 +576,7 @@
                 <span class="logo-pill">Arizona Sunset</span>
             </h1>
             <div class="tagline">
-                Heavy-Duty warm-ups, plates, and logbook — plus your full 3-day Push / Legs / Pull split.
+                Heavy-Duty warm-ups, plates, timers, and logbook — with full 3-day Push / Legs / Pull tracking.
             </div>
         </div>
     </header>
@@ -521,35 +704,17 @@
                 Day 1 — Push
                 <span class="badge">Chest / Shoulders / Triceps</span>
             </h2>
-            <p class="day-subtitle"><strong>⚡ First exercise gets warm-ups (30% × 5, 50% × 5)</strong></p>
+            <p class="subsection-title" style="margin-top:4px;">Exercises</p>
 
-            <ol class="split-list">
-                <li>
-                    <strong>Incline Barbell Bench Press</strong><br>
-                    Warm-ups: ✔<br>
-                    Working Sets: 6–10 + failure
-                </li>
+            <div class="exercise-list" id="pushExercises"></div>
 
-                <li>
-                    <strong>Flat Barbell Bench Press</strong><br>
-                    Working Sets: 6–10 Failure
-                </li>
+            <div class="exercise-actions">
+                <button type="button" class="btn-ghost add-exercise-btn" data-day="push">+ Add Exercise</button>
+            </div>
 
-                <li>
-                    <strong>Weighted Dips (Chest-focused)</strong><br>
-                    Working Sets: 6–10 Failure
-                </li>
-
-                <li>
-                    <strong>Dumbbell Lateral Raises</strong><br>
-                    Working Sets: 10–15 Failure
-                </li>
-
-                <li>
-                    <strong>Optional:</strong> Rope Pushdown <em>or</em> Skull Crushers<br>
-                    Working Sets: 8–12 Failure
-                </li>
-            </ol>
+            <div class="day-save-row">
+                <button type="button" class="btn-secondary save-day-btn" data-day="push">Save Day 1 Log</button>
+            </div>
         </div>
     </section>
 
@@ -560,35 +725,17 @@
                 Day 2 — Legs
                 <span class="badge">Quads / Hams / Calves</span>
             </h2>
-            <p class="day-subtitle"><strong>⚡ Warm-ups only for back squat</strong></p>
+            <p class="subsection-title" style="margin-top:4px;">Exercises</p>
 
-            <ol class="split-list">
-                <li>
-                    <strong>Barbell Back Squat</strong><br>
-                    Warm-ups: ✔<br>
-                    Working Sets: 6–10 Failure
-                </li>
+            <div class="exercise-list" id="legsExercises"></div>
 
-                <li>
-                    <strong>Romanian Deadlift</strong><br>
-                    Working Sets: 6–10 Failure
-                </li>
+            <div class="exercise-actions">
+                <button type="button" class="btn-ghost add-exercise-btn" data-day="legs">+ Add Exercise</button>
+            </div>
 
-                <li>
-                    <strong>Hamstring Curl (Machine)</strong><br>
-                    Working Sets: 8–12 Failure
-                </li>
-
-                <li>
-                    <strong>Calf Raises (Standing or Seated)</strong><br>
-                    Working Sets: 10–15 Failure
-                </li>
-
-                <li>
-                    <strong>Optional:</strong> Leg Press or Hack Squat<br>
-                    Working Sets: 8–12 Failure
-                </li>
-            </ol>
+            <div class="day-save-row">
+                <button type="button" class="btn-secondary save-day-btn" data-day="legs">Save Day 2 Log</button>
+            </div>
         </div>
     </section>
 
@@ -599,39 +746,45 @@
                 Day 3 — Pull
                 <span class="badge">Back / Rear Delts / Biceps</span>
             </h2>
-            <p class="day-subtitle"><strong>⚡ Warm-ups only for Weighted Pull-Ups</strong></p>
+            <p class="subsection-title" style="margin-top:4px;">Exercises</p>
 
-            <ol class="split-list">
-                <li>
-                    <strong>Weighted Pull-Ups</strong><br>
-                    Warm-ups (bodyweight only):<br>
-                    BW × 5<br>
-                    BW × 5<br>
-                    Working Sets: 6–10 Failure
-                </li>
+            <div class="exercise-list" id="pullExercises"></div>
 
-                <li>
-                    <strong>Bent-Over Barbell Row</strong><br>
-                    Working Sets: 6–10 Failure
-                </li>
+            <div class="exercise-actions">
+                <button type="button" class="btn-ghost add-exercise-btn" data-day="pull">+ Add Exercise</button>
+            </div>
 
-                <li>
-                    <strong>Barbell Biceps Curl</strong><br>
-                    Working Sets: 6–10 Failure
-                </li>
-
-                <li>
-                    <strong>Rear Delt Flys</strong><br>
-                    Working Sets: 10–15 Failure
-                </li>
-
-                <li>
-                    <strong>Optional:</strong> Barbell Shrugs<br>
-                    Working Sets: 8–12 Failure
-                </li>
-            </ol>
+            <div class="day-save-row">
+                <button type="button" class="btn-secondary save-day-btn" data-day="pull">Save Day 3 Log</button>
+            </div>
         </div>
     </section>
+
+    <!-- TIMER FOOTER -->
+    <div class="timer-footer">
+        <div class="timer-block">
+            <div class="timer-label">Workout Timer</div>
+            <div class="timer-display" id="workoutDisplay">00:00</div>
+            <div class="timer-controls">
+                <button class="timer-btn primary" id="workoutStartPause">Start</button>
+                <button class="timer-btn" id="workoutReset">Reset</button>
+            </div>
+        </div>
+
+        <div class="timer-block">
+            <div class="timer-label">Rest Timer</div>
+            <div class="timer-display" id="restDisplay">00s</div>
+            <div class="rest-presets">
+                <button class="timer-btn rest-preset" data-sec="60">60s</button>
+                <button class="timer-btn rest-preset" data-sec="90">90s</button>
+                <button class="timer-btn rest-preset" data-sec="120">120s</button>
+            </div>
+            <div class="timer-controls">
+                <button class="timer-btn primary" id="restStartPause">Start</button>
+                <button class="timer-btn" id="restReset">Reset</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -703,7 +856,6 @@
     const previousStatsDiv = document.getElementById("previousStats");
     const suggestionTextDiv = document.getElementById("suggestionText");
 
-    // Update template hint
     function updateTemplateHint() {
         const tKey = templateSelect.value;
         const t = TEMPLATES[tKey];
@@ -717,7 +869,6 @@
     templateSelect.addEventListener("change", updateTemplateHint);
     updateTemplateHint();
 
-    // Unit toggle
     kgBtn.addEventListener("click", () => setUnit("kg"));
     lbBtn.addEventListener("click", () => setUnit("lb"));
 
@@ -734,7 +885,6 @@
         }
     }
 
-    // Format helpers
     function formatWeight(value) {
         if (!isFinite(value)) return "-";
         return value.toFixed(1).replace(/\.0$/, "");
@@ -744,7 +894,6 @@
         return currentUnit === "kg" ? KG_PLATES : LB_PLATES;
     }
 
-    // Plate math
     function computePlates(targetWeight, barWeight) {
         const plateSizes = plateConfig();
         const epsilon = 1e-6;
@@ -778,7 +927,6 @@
         return { text: text + " / side", raw: platesPerSide };
     }
 
-    // Warm-up calculation
     function calculateWarmups() {
         const work = parseFloat(workingWeightInput.value);
         const bar = parseFloat(barWeightInput.value);
@@ -819,7 +967,7 @@
 
     calcBtn.addEventListener("click", calculateWarmups);
 
-    // LocalStorage log
+    // LocalStorage log (calculator)
     const LOG_KEY = "olympusLogs_v1";
 
     function loadLogs() {
@@ -851,7 +999,6 @@
         return d.toLocaleDateString(undefined, { day: "2-digit", month: "2-digit" });
     }
 
-    // Progress section
     function updateProgressSection(lift, unit) {
         const logs = loadLogs().filter(l => l.lift === lift && l.unit === unit);
 
@@ -878,7 +1025,6 @@
         suggestionTextDiv.innerHTML = `Next target: <strong>${formatWeight(suggested)} ${unit}</strong>`;
     }
 
-    // Save session
     function saveSession() {
         const weight = parseFloat(workingWeightInput.value);
         const reps = parseInt(actualRepsInput.value, 10);
@@ -903,6 +1049,299 @@
     }
 
     saveSessionBtn.addEventListener("click", saveSession);
+
+    // ---- Exercise logging per day ----
+    const DEFAULT_SPLIT = {
+        push: [
+            "Incline Barbell Bench Press",
+            "Flat Barbell Bench Press",
+            "Weighted Dips (Chest-focused)",
+            "Dumbbell Lateral Raises",
+            "Rope Pushdown / Skull Crushers"
+        ],
+        legs: [
+            "Barbell Back Squat",
+            "Romanian Deadlift",
+            "Hamstring Curl (Machine)",
+            "Calf Raises",
+            "Leg Press / Hack Squat"
+        ],
+        pull: [
+            "Weighted Pull-Ups",
+            "Bent-Over Barbell Row",
+            "Barbell Biceps Curl",
+            "Rear Delt Flys",
+            "Barbell Shrugs"
+        ]
+    };
+
+    const DAY_CONTAINERS = {
+        push: document.getElementById("pushExercises"),
+        legs: document.getElementById("legsExercises"),
+        pull: document.getElementById("pullExercises")
+    };
+
+    const DAY_LOG_KEY = "olympusDayLogs_v1";
+
+    function loadDayLogs() {
+        try {
+            const raw = localStorage.getItem(DAY_LOG_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function saveDayLogs(logs) {
+        localStorage.setItem(DAY_LOG_KEY, JSON.stringify(logs));
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>"']/g, function (c) {
+            return ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[c];
+        });
+    }
+
+    function addSetRow(card) {
+        const container = card.querySelector(".sets-container");
+        const index = container.children.length + 1;
+        const row = document.createElement("div");
+        row.className = "set-row";
+        row.innerHTML = `
+            <span class="set-label">Set ${index}</span>
+            <input type="number" class="set-weight" placeholder="Weight" step="0.5" />
+            <input type="number" class="set-reps" placeholder="Reps" step="1" />
+            <button type="button" class="remove-set-btn">×</button>
+        `;
+        container.appendChild(row);
+
+        const removeBtn = row.querySelector(".remove-set-btn");
+        removeBtn.addEventListener("click", () => {
+            row.remove();
+            Array.from(container.children).forEach((r, i) => {
+                const label = r.querySelector(".set-label");
+                if (label) label.textContent = `Set ${i + 1}`;
+            });
+        });
+    }
+
+    function createExerciseCard(dayKey, name) {
+        const container = DAY_CONTAINERS[dayKey];
+        if (!container) return;
+
+        const card = document.createElement("div");
+        card.className = "exercise-card";
+
+        card.innerHTML = `
+            <div class="exercise-header">
+                <div class="exercise-header-left">
+                    <button type="button" class="exercise-toggle">▼</button>
+                    <span class="exercise-name">${escapeHtml(name)}</span>
+                </div>
+            </div>
+            <div class="exercise-body">
+                <div class="sets-container"></div>
+                <button type="button" class="btn-ghost add-set-btn">+ Add Set</button>
+                <label class="notes-label">Notes</label>
+                <textarea class="exercise-notes" rows="2" placeholder="Notes, RPE, technique..."></textarea>
+            </div>
+        `;
+
+        const body = card.querySelector(".exercise-body");
+        const toggleBtn = card.querySelector(".exercise-toggle");
+
+        toggleBtn.addEventListener("click", () => {
+            const collapsed = body.classList.toggle("collapsed");
+            toggleBtn.textContent = collapsed ? "▶" : "▼";
+        });
+
+        const header = card.querySelector(".exercise-header");
+        header.addEventListener("click", (e) => {
+            if (e.target === toggleBtn) return;
+            const collapsed = body.classList.toggle("collapsed");
+            toggleBtn.textContent = collapsed ? "▶" : "▼";
+        });
+
+        const addSetBtn = card.querySelector(".add-set-btn");
+        addSetBtn.addEventListener("click", () => addSetRow(card));
+
+        // Start with 1 set row
+        addSetRow(card);
+
+        container.appendChild(card);
+    }
+
+    function initDefaultExercises() {
+        ["push", "legs", "pull"].forEach(dayKey => {
+            DEFAULT_SPLIT[dayKey].forEach(name => createExerciseCard(dayKey, name));
+        });
+    }
+
+    initDefaultExercises();
+
+    // Add exercise buttons
+    document.querySelectorAll(".add-exercise-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const day = btn.getAttribute("data-day");
+            const name = prompt("Exercise name:");
+            if (name && name.trim()) {
+                createExerciseCard(day, name.trim());
+            }
+        });
+    });
+
+    // Save day log
+    document.querySelectorAll(".save-day-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const day = btn.getAttribute("data-day");
+            saveDayLog(day);
+        });
+    });
+
+    function saveDayLog(dayKey) {
+        const container = DAY_CONTAINERS[dayKey];
+        if (!container) return;
+
+        const cards = container.querySelectorAll(".exercise-card");
+        const log = {
+            day: dayKey,
+            date: new Date().toISOString(),
+            exercises: []
+        };
+
+        cards.forEach(card => {
+            const name = card.querySelector(".exercise-name").textContent.trim();
+            const notes = card.querySelector(".exercise-notes").value.trim();
+            const sets = [];
+
+            card.querySelectorAll(".set-row").forEach(row => {
+                const w = parseFloat(row.querySelector(".set-weight").value);
+                const r = parseInt(row.querySelector(".set-reps").value, 10);
+                if (isFinite(w) && w > 0 && Number.isFinite(r) && r > 0) {
+                    sets.push({ weight: w, reps: r });
+                }
+            });
+
+            if (name || sets.length || notes) {
+                log.exercises.push({ name, notes, sets });
+            }
+        });
+
+        const logs = loadDayLogs();
+        logs.push(log);
+        saveDayLogs(logs);
+
+        alert("Day " + (dayKey === "push" ? "1" : dayKey === "legs" ? "2" : "3") + " log saved!");
+    }
+
+    // ---- Timers ----
+    // Workout timer (stopwatch)
+    const workoutDisplay = document.getElementById("workoutDisplay");
+    const workoutStartPauseBtn = document.getElementById("workoutStartPause");
+    const workoutResetBtn = document.getElementById("workoutReset");
+
+    let workoutSeconds = 0;
+    let workoutInterval = null;
+    let workoutRunning = false;
+
+    function formatTime(sec) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+    }
+
+    function updateWorkoutDisplay() {
+        workoutDisplay.textContent = formatTime(workoutSeconds);
+    }
+
+    workoutStartPauseBtn.addEventListener("click", () => {
+        if (!workoutRunning) {
+            workoutRunning = true;
+            workoutStartPauseBtn.textContent = "Pause";
+            workoutInterval = setInterval(() => {
+                workoutSeconds += 1;
+                updateWorkoutDisplay();
+            }, 1000);
+        } else {
+            workoutRunning = false;
+            workoutStartPauseBtn.textContent = "Start";
+            clearInterval(workoutInterval);
+        }
+    });
+
+    workoutResetBtn.addEventListener("click", () => {
+        workoutRunning = false;
+        clearInterval(workoutInterval);
+        workoutSeconds = 0;
+        updateWorkoutDisplay();
+        workoutStartPauseBtn.textContent = "Start";
+    });
+
+    updateWorkoutDisplay();
+
+    // Rest timer (countdown)
+    const restDisplay = document.getElementById("restDisplay");
+    const restStartPauseBtn = document.getElementById("restStartPause");
+    const restResetBtn = document.getElementById("restReset");
+    const restPresetBtns = document.querySelectorAll(".rest-preset");
+
+    let restDuration = 90;
+    let restRemaining = 90;
+    let restInterval = null;
+    let restRunning = false;
+
+    function updateRestDisplay() {
+        restDisplay.textContent = String(restRemaining) + "s";
+    }
+
+    restPresetBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const sec = parseInt(btn.getAttribute("data-sec"), 10);
+            if (!Number.isFinite(sec)) return;
+            restDuration = sec;
+            restRemaining = sec;
+            updateRestDisplay();
+        });
+    });
+
+    restStartPauseBtn.addEventListener("click", () => {
+        if (!restRunning) {
+            if (restRemaining <= 0) restRemaining = restDuration;
+            restRunning = true;
+            restStartPauseBtn.textContent = "Pause";
+            restInterval = setInterval(() => {
+                restRemaining -= 1;
+                if (restRemaining <= 0) {
+                    restRemaining = 0;
+                    clearInterval(restInterval);
+                    restRunning = false;
+                    restStartPauseBtn.textContent = "Start";
+                    alert("Rest over — time to hit the next set.");
+                }
+                updateRestDisplay();
+            }, 1000);
+        } else {
+            restRunning = false;
+            restStartPauseBtn.textContent = "Start";
+            clearInterval(restInterval);
+        }
+    });
+
+    restResetBtn.addEventListener("click", () => {
+        restRunning = false;
+        clearInterval(restInterval);
+        restRemaining = restDuration;
+        updateRestDisplay();
+        restStartPauseBtn.textContent = "Start";
+    });
+
+    updateRestDisplay();
 
     // Defaults
     setUnit("kg");
