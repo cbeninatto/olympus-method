@@ -703,6 +703,7 @@
     const previousStatsDiv = document.getElementById("previousStats");
     const suggestionTextDiv = document.getElementById("suggestionText");
 
+    // Update template hint
     function updateTemplateHint() {
         const tKey = templateSelect.value;
         const t = TEMPLATES[tKey];
@@ -716,6 +717,7 @@
     templateSelect.addEventListener("change", updateTemplateHint);
     updateTemplateHint();
 
+    // Unit toggle
     kgBtn.addEventListener("click", () => setUnit("kg"));
     lbBtn.addEventListener("click", () => setUnit("lb"));
 
@@ -732,6 +734,7 @@
         }
     }
 
+    // Format helpers
     function formatWeight(value) {
         if (!isFinite(value)) return "-";
         return value.toFixed(1).replace(/\.0$/, "");
@@ -741,6 +744,7 @@
         return currentUnit === "kg" ? KG_PLATES : LB_PLATES;
     }
 
+    // Plate math
     function computePlates(targetWeight, barWeight) {
         const plateSizes = plateConfig();
         const epsilon = 1e-6;
@@ -774,6 +778,7 @@
         return { text: text + " / side", raw: platesPerSide };
     }
 
+    // Warm-up calculation
     function calculateWarmups() {
         const work = parseFloat(workingWeightInput.value);
         const bar = parseFloat(barWeightInput.value);
@@ -787,46 +792,23 @@
             return;
         }
 
-        const tKey = templateSelect.value;
-        const tpl = TEMPLATES[tKey];
-        if (!tpl) return;
-
+        const tpl = TEMPLATES[templateSelect.value];
         resultsBody.innerHTML = "";
 
-        tpl.sets.forEach((set, index) => {
-            const setNumber = index + 1;
+        tpl.sets.forEach((set, idx) => {
             const target = work * set.percent;
             const plates = computePlates(target, bar);
 
             const tr = document.createElement("tr");
 
-            const tdSet = document.createElement("td");
-            tdSet.textContent = setNumber;
-
-            const tdType = document.createElement("td");
-            const pill = document.createElement("span");
-            pill.className = "pill " + (set.type === "Working" ? "work" : "warm");
-            pill.textContent = set.type;
-            tdType.appendChild(pill);
-
-            const tdPercent = document.createElement("td");
-            tdPercent.textContent = Math.round(set.percent * 100) + "%";
-
-            const tdReps = document.createElement("td");
-            tdReps.textContent = set.reps;
-
-            const tdTarget = document.createElement("td");
-            tdTarget.textContent = `${formatWeight(target)} ${currentUnit}`;
-
-            const tdPlates = document.createElement("td");
-            tdPlates.textContent = plates.text;
-
-            tr.appendChild(tdSet);
-            tr.appendChild(tdType);
-            tr.appendChild(tdPercent);
-            tr.appendChild(tdReps);
-            tr.appendChild(tdTarget);
-            tr.appendChild(tdPlates);
+            tr.innerHTML = `
+                <td>${idx + 1}</td>
+                <td><span class="pill ${set.type === "Working" ? "work" : "warm"}">${set.type}</span></td>
+                <td>${Math.round(set.percent * 100)}%</td>
+                <td>${set.reps}</td>
+                <td>${formatWeight(target)} ${currentUnit}</td>
+                <td>${plates.text}</td>
+            `;
 
             resultsBody.appendChild(tr);
         });
@@ -837,17 +819,14 @@
 
     calcBtn.addEventListener("click", calculateWarmups);
 
-    // ---- Local log in localStorage ----
+    // LocalStorage log
     const LOG_KEY = "olympusLogs_v1";
 
     function loadLogs() {
         try {
             const raw = localStorage.getItem(LOG_KEY);
-            if (!raw) return [];
-            const parsed = JSON.parse(raw);
-            if (!Array.isArray(parsed)) return [];
-            return parsed;
-        } catch (e) {
+            return raw ? JSON.parse(raw) : [];
+        } catch {
             return [];
         }
     }
@@ -869,76 +848,58 @@
 
     function formatDateShort(iso) {
         const d = new Date(iso);
-        if (!isFinite(d.getTime())) return "";
         return d.toLocaleDateString(undefined, { day: "2-digit", month: "2-digit" });
     }
 
+    // Progress section
     function updateProgressSection(lift, unit) {
-        const logs = loadLogs()
-            .filter(l => l.lift === lift && l.unit === unit)
-            .sort((a, b) => new Date(a.date) - new Date(b.date));
+        const logs = loadLogs().filter(l => l.lift === lift && l.unit === unit);
 
         if (logs.length < 2) {
             previousStatsDiv.style.display = "block";
-            suggestionTextDiv.style.display = "block";
-            previousStatsDiv.textContent = "Not enough history yet. Log at least two sessions for this lift to see weekly comparison.";
-            suggestionTextDiv.textContent = "";
+            previousStatsDiv.textContent = "Not enough history yet.";
+            suggestionTextDiv.style.display = "none";
             return;
         }
 
+        logs.sort((a, b) => new Date(a.date) - new Date(b.date));
+
         const prev = logs[logs.length - 2];
-        const current = logs[logs.length - 1];
-
-        const prevStr = `${formatWeight(prev.weight)} ${unit} × ${prev.reps} reps`;
-        const currStr = `${formatWeight(current.weight)} ${unit} × ${current.reps} reps`;
-
-        const dayDiffMs = new Date(current.date) - new Date(prev.date);
-        const dayDiff = dayDiffMs / (1000 * 60 * 60 * 24);
-
-        let weekText = "";
-        if (dayDiff > 5 && dayDiff < 9) {
-            weekText = " (~1 week apart)";
-        }
+        const curr = logs[logs.length - 1];
 
         previousStatsDiv.style.display = "block";
         previousStatsDiv.innerHTML =
-            `Last session for this lift: <strong>${prevStr</strong> on ${formatDateShort(prev.date)}.<br>` +
-            `Current session: <strong>${currStr}</strong> on ${formatDateShort(current.date)}${weekText}.`;
+            `Last session: <strong>${formatWeight(prev.weight)} ${unit} × ${prev.reps}</strong> on ${formatDateShort(prev.date)}<br>` +
+            `Today: <strong>${formatWeight(curr.weight)} ${unit} × ${curr.reps}</strong>`;
 
-        const suggested = suggestNextWeight(current.weight, current.reps, unit);
+        const suggested = suggestNextWeight(curr.weight, curr.reps, unit);
 
         suggestionTextDiv.style.display = "block";
-        suggestionTextDiv.innerHTML =
-            `Suggested next working weight: <strong>${formatWeight(suggested)} ${unit}</strong> ` +
-            `(based on ${current.reps} reps this session).`;
+        suggestionTextDiv.innerHTML = `Next target: <strong>${formatWeight(suggested)} ${unit}</strong>`;
     }
 
+    // Save session
     function saveSession() {
-        const work = parseFloat(workingWeightInput.value);
+        const weight = parseFloat(workingWeightInput.value);
         const reps = parseInt(actualRepsInput.value, 10);
         const lift = liftSelect.value;
 
-        if (!isFinite(work) || work <= 0) {
-            alert("Enter a valid working set weight before logging.");
-            return;
-        }
-        if (!Number.isFinite(reps) || reps <= 0) {
-            alert("Enter the actual reps you achieved on your top set.");
-            return;
-        }
+        if (!isFinite(weight) || weight <= 0) return alert("Enter weight");
+        if (!reps || reps <= 0) return alert("Enter reps");
 
         const logs = loadLogs();
         logs.push({
-            date: new Date().toISOString(),
-            lift: lift,
+            lift,
             unit: currentUnit,
-            weight: work,
-            reps: reps
+            weight,
+            reps,
+            date: new Date().toISOString()
         });
-        saveLogs(logs);
 
+        saveLogs(logs);
         updateProgressSection(lift, currentUnit);
-        alert("Session saved for " + lift.toUpperCase() + "!");
+
+        alert("Session saved!");
     }
 
     saveSessionBtn.addEventListener("click", saveSession);
