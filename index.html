@@ -401,6 +401,48 @@
         color: var(--text-soft);
     }
 
+    /* Standards result badges */
+    .standard-line {
+        margin-top: 4px;
+        font-size: 0.85rem;
+    }
+
+    .standard-label {
+        color: var(--text-soft);
+    }
+
+    .standard-value {
+        font-weight: 600;
+        margin-left: 4px;
+        margin-right: 6px;
+    }
+
+    .standard-score {
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .score-below {
+        background: #ff4d4d22;
+        color: #ff4d4d;
+    }
+    .score-good {
+        background: #00eaff22;
+        color: #00eaff;
+    }
+    .score-great {
+        background: #2aff8022;
+        color: #2aff80;
+    }
+    .score-godlike {
+        background: #ffd84d22;
+        color: #ffd84d;
+    }
+
     /* Exercise cards */
     .exercise-list {
         display: flex;
@@ -485,7 +527,7 @@
 
     .set-row {
         display: grid;
-        grid-template-columns: auto minmax(0,1fr) minmax(0,1fr) auto;
+        grid-template-columns: auto minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,1.2fr) auto;
         gap: 6px;
         align-items: center;
     }
@@ -495,8 +537,13 @@
         color: var(--text-soft);
     }
 
+    .set-row select,
     .set-row input {
         width: 100%;
+    }
+
+    .set-type {
+        font-size: 0.78rem;
     }
 
     .remove-set-btn {
@@ -696,7 +743,7 @@
                 <span class="logo-pill">Heavy Duty</span>
             </h1>
             <div class="tagline">
-                High-intensity warm-ups, timers, and a full 3-day Push / Legs / Pull log — tuned for real gym use.
+                Warm-ups, standards, timers, and a 3-day Push / Legs / Pull log — built for real gym use.
             </div>
         </div>
         <div class="header-right">
@@ -726,12 +773,89 @@
 
     <!-- TAB 1: CALCULATOR -->
     <section id="tab-calculator" class="tab-panel active">
-        <div class="grid">
+        <!-- Body standards -->
+        <div class="card">
+            <h2>
+                Physique Standards
+                <span class="badge">Body</span>
+            </h2>
+            <div class="row">
+                <div>
+                    <label for="heightInput">Height (cm or in)</label>
+                    <input type="number" id="heightInput" placeholder="e.g. 178" step="0.1" min="0" inputmode="decimal" />
+                </div>
+                <div>
+                    <label for="waistInput">Waist</label>
+                    <input type="number" id="waistInput" placeholder="Same unit as height" step="0.1" min="0" inputmode="decimal" />
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="chestInput">Chest</label>
+                    <input type="number" id="chestInput" placeholder="Same unit as waist" step="0.1" min="0" inputmode="decimal" />
+                </div>
+                <div>
+                    <label for="armsInput">Arms (cold, flexed)</label>
+                    <input type="number" id="armsInput" placeholder="Same unit as waist" step="0.1" min="0" inputmode="decimal" />
+                </div>
+            </div>
+            <button class="btn-main" id="evaluateBodyBtn">Evaluate Physique Standards</button>
+
+            <div id="bodyStandardsResult" class="empty-note">
+                Fill the measurements and tap <strong>Evaluate</strong> to see where you stand.
+            </div>
+        </div>
+
+        <!-- Strength standards -->
+        <div class="card" style="margin-top:14px;">
+            <h2>
+                Strength Standards
+                <span class="badge">Lifts (5 reps)</span>
+            </h2>
+
+            <div class="row">
+                <div>
+                    <label for="stdBW">Bodyweight</label>
+                    <input type="number" id="stdBW" placeholder="kg or lb (matches unit toggle)" step="0.5" min="0" inputmode="decimal" />
+                </div>
+                <div>
+                    <label for="stdIncline">Incline Bench 5RM</label>
+                    <input type="number" id="stdIncline" placeholder="e.g. 100" step="0.5" min="0" inputmode="decimal" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label for="stdChins">Weighted Chins 5RM (added weight)</label>
+                    <input type="number" id="stdChins" placeholder="e.g. 30" step="0.5" min="0" inputmode="decimal" />
+                </div>
+                <div>
+                    <label for="stdOHP">Overhead Press 5RM</label>
+                    <input type="number" id="stdOHP" placeholder="e.g. 60" step="0.5" min="0" inputmode="decimal" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label for="stdCurl">Barbell Curl 5RM</label>
+                    <input type="number" id="stdCurl" placeholder="e.g. 40" step="0.5" min="0" inputmode="decimal" />
+                </div>
+            </div>
+
+            <button class="btn-main" id="evaluateStrengthBtn">Evaluate Strength Standards</button>
+
+            <div id="strengthStandardsResult" class="empty-note">
+                Enter bodyweight and lifts, then tap <strong>Evaluate</strong>.
+            </div>
+        </div>
+
+        <!-- Warm-up calculator -->
+        <div class="grid" style="margin-top:14px;">
             <!-- LEFT: Inputs -->
             <div class="card">
                 <h2>
-                    Lift Setup
-                    <span class="badge">Warm-Ups</span>
+                    Warm-Up Calculator
+                    <span class="badge">Sets & Plates</span>
                 </h2>
 
                 <label for="liftSelect">Lift</label>
@@ -967,6 +1091,210 @@
     kgBtn.addEventListener("click", () => setUnit("kg"));
     lbBtn.addEventListener("click", () => setUnit("lb"));
 
+    // ---- Standards helpers ----
+    function classifyBand(value, thresholds) {
+        // thresholds: {good, great, godlike}
+        if (value >= thresholds.godlike) return "godlike";
+        if (value >= thresholds.great) return "great";
+        if (value >= thresholds.good) return "good";
+        return "below";
+    }
+
+    function bandLabel(band) {
+        switch (band) {
+            case "good": return "Good";
+            case "great": return "Great";
+            case "godlike": return "Godlike";
+            default: return "Below Good";
+        }
+    }
+
+    function bandClass(band) {
+        switch (band) {
+            case "good": return "score-good";
+            case "great": return "score-great";
+            case "godlike": return "score-godlike";
+            default: return "score-below";
+        }
+    }
+
+    // ---- Physique Standards ----
+    const heightInput = document.getElementById("heightInput");
+    const waistInput = document.getElementById("waistInput");
+    const chestInput = document.getElementById("chestInput");
+    const armsInput = document.getElementById("armsInput");
+    const evaluateBodyBtn = document.getElementById("evaluateBodyBtn");
+    const bodyStandardsResult = document.getElementById("bodyStandardsResult");
+
+    evaluateBodyBtn.addEventListener("click", () => {
+        const h = parseFloat(heightInput.value);
+        const w = parseFloat(waistInput.value);
+        const c = parseFloat(chestInput.value);
+        const a = parseFloat(armsInput.value);
+
+        if (!isFinite(h) || h <= 0 || !isFinite(w) || w <= 0) {
+            alert("Enter at least height and waist.");
+            return;
+        }
+
+        let html = "";
+
+        // Waist % height
+        const waistRatio = w / h;
+        const waistPerc = waistRatio * 100;
+        const waistBand = classifyBand(waistRatio, {
+            godlike: 0.45,
+            great: 0.46,
+            good: 0.47
+        });
+        html += `
+            <div class="standard-line">
+                <span class="standard-label">Waist / Height:</span>
+                <span class="standard-value">${waistPerc.toFixed(1)}%</span>
+                <span class="standard-score ${bandClass(waistBand)}">${bandLabel(waistBand)}</span>
+            </div>
+        `;
+
+        // Chest / Waist
+        if (isFinite(c) && c > 0) {
+            const cw = c / w;
+            const chestBand = classifyBand(cw, {
+                godlike: 1.40,
+                great: 1.35,
+                good: 1.30
+            });
+            html += `
+                <div class="standard-line">
+                    <span class="standard-label">Chest / Waist:</span>
+                    <span class="standard-value">${cw.toFixed(2)}×</span>
+                    <span class="standard-score ${bandClass(chestBand)}">${bandLabel(chestBand)}</span>
+                </div>
+            `;
+        }
+
+        // Arms / Waist
+        if (isFinite(a) && a > 0) {
+            const aw = a / w;
+            const armsBand = classifyBand(aw, {
+                godlike: 0.50,
+                great: 0.48,
+                good: 0.46
+            });
+            html += `
+                <div class="standard-line">
+                    <span class="standard-label">Arms / Waist:</span>
+                    <span class="standard-value">${(aw * 100).toFixed(1)}%</span>
+                    <span class="standard-score ${bandClass(armsBand)}">${bandLabel(armsBand)}</span>
+                </div>
+            `;
+        }
+
+        if (!html) {
+            html = "Add chest and arms to see more detailed standards.";
+        }
+
+        bodyStandardsResult.classList.remove("empty-note");
+        bodyStandardsResult.innerHTML = html;
+    });
+
+    // ---- Strength Standards ----
+    const stdBW = document.getElementById("stdBW");
+    const stdIncline = document.getElementById("stdIncline");
+    const stdChins = document.getElementById("stdChins");
+    const stdOHP = document.getElementById("stdOHP");
+    const stdCurl = document.getElementById("stdCurl");
+    const evaluateStrengthBtn = document.getElementById("evaluateStrengthBtn");
+    const strengthStandardsResult = document.getElementById("strengthStandardsResult");
+
+    evaluateStrengthBtn.addEventListener("click", () => {
+        const BW = parseFloat(stdBW.value);
+        if (!isFinite(BW) || BW <= 0) {
+            alert("Enter your bodyweight.");
+            return;
+        }
+
+        let html = "";
+
+        // Incline bench
+        const inc = parseFloat(stdIncline.value);
+        if (isFinite(inc) && inc > 0) {
+            const ratio = inc / BW;
+            const band = classifyBand(ratio, {
+                godlike: 1.25,
+                great: 1.10,
+                good: 0.90
+            });
+            html += `
+                <div class="standard-line">
+                    <span class="standard-label">Incline Bench (5 reps):</span>
+                    <span class="standard-value">${ratio.toFixed(2)}× BW</span>
+                    <span class="standard-score ${bandClass(band)}">${bandLabel(band)}</span>
+                </div>
+            `;
+        }
+
+        // Weighted chins (added weight)
+        const chin = parseFloat(stdChins.value);
+        if (isFinite(chin) && chin > 0) {
+            const perc = chin / BW;
+            const band = classifyBand(perc, {
+                godlike: 0.60,
+                great: 0.45,
+                good: 0.30
+            });
+            html += `
+                <div class="standard-line">
+                    <span class="standard-label">Weighted Chins (5 reps):</span>
+                    <span class="standard-value">${(perc * 100).toFixed(1)}% BW</span>
+                    <span class="standard-score ${bandClass(band)}">${bandLabel(band)}</span>
+                </div>
+            `;
+        }
+
+        // OHP
+        const ohp = parseFloat(stdOHP.value);
+        if (isFinite(ohp) && ohp > 0) {
+            const ratio = ohp / BW;
+            const band = classifyBand(ratio, {
+                godlike: 0.90,
+                great: 0.80,
+                good: 0.65
+            });
+            html += `
+                <div class="standard-line">
+                    <span class="standard-label">Overhead Press (5 reps):</span>
+                    <span class="standard-value">${ratio.toFixed(2)}× BW</span>
+                    <span class="standard-score ${bandClass(band)}">${bandLabel(band)}</span>
+                </div>
+            `;
+        }
+
+        // Curl
+        const curl = parseFloat(stdCurl.value);
+        if (isFinite(curl) && curl > 0) {
+            const ratio = curl / BW;
+            const band = classifyBand(ratio, {
+                godlike: 0.65,
+                great: 0.55,
+                good: 0.45
+            });
+            html += `
+                <div class="standard-line">
+                    <span class="standard-label">Barbell Curl (5 reps):</span>
+                    <span class="standard-value">${ratio.toFixed(2)}× BW</span>
+                    <span class="standard-score ${bandClass(band)}">${bandLabel(band)}</span>
+                </div>
+            `;
+        }
+
+        if (!html) {
+            html = "Add your main lifts to see the strength standards.";
+        }
+
+        strengthStandardsResult.classList.remove("empty-note");
+        strengthStandardsResult.innerHTML = html;
+    });
+
     // ---- Warm-up logic / calculator ----
     const TEMPLATES = {
         soviet: {
@@ -1156,7 +1484,8 @@
             "Flat Barbell Bench Press",
             "Weighted Dips (Chest-focused)",
             "Dumbbell Lateral Raises",
-            "Rope Pushdown / Skull Crushers"
+            "Rope Pushdown (Optional)",
+            "Skull Crushers (Optional)"
         ],
         legs: [
             "Barbell Back Squat",
@@ -1171,7 +1500,7 @@
             "Bent-Over Barbell Row",
             "Barbell Biceps Curl",
             "Rear Delt Flys",
-            "Barbell Shrugs"
+            "Barbell Shrugs (Optional)"
         ]
     };
 
@@ -1187,24 +1516,49 @@
         });
     }
 
-    // Add set row; returns the row element
-    function addSetRow(card, autoFocusWeight = true) {
+    // Add set row with new Type column
+    function addSetRow(card, autoFocusWeight = true, autofill = null) {
         const container = card.querySelector(".sets-container");
         const index = container.children.length + 1;
         const row = document.createElement("div");
         row.className = "set-row";
+
         row.innerHTML = `
             <span class="set-label">Set ${index}</span>
+            <select class="set-type">
+                <option value=""></option>
+                <option value="Warm-up">Warm-up</option>
+                <option value="Working">Working</option>
+                <option value="Top Set">Top Set</option>
+                <option value="Backoff">Backoff</option>
+                <option value="Failure">Failure</option>
+                <option value="Drop Set">Drop Set</option>
+                <option value="Optional Set">Optional Set</option>
+            </select>
             <input type="number" class="set-weight" placeholder="Weight" step="0.5" inputmode="decimal" />
             <input type="number" class="set-reps" placeholder="Reps" step="1" inputmode="numeric" />
             <button type="button" class="remove-set-btn">×</button>
         `;
+
         container.appendChild(row);
 
+        const typeSelect = row.querySelector(".set-type");
         const weightInput = row.querySelector(".set-weight");
         const repsInput = row.querySelector(".set-reps");
         const removeBtn = row.querySelector(".remove-set-btn");
         const dayKey = card.dataset.dayKey;
+
+        if (autofill) {
+            if (typeof autofill.weight === "number") {
+                weightInput.value = autofill.weight;
+            }
+            if (typeof autofill.reps === "number") {
+                repsInput.value = autofill.reps;
+            }
+            if (autofill.type) {
+                typeSelect.value = autofill.type;
+            }
+        }
 
         if (autoFocusWeight) {
             weightInput.focus();
@@ -1226,6 +1580,7 @@
             autoSaveDayLog(dayKey);
         });
 
+        typeSelect.addEventListener("change", () => autoSaveDayLog(dayKey));
         weightInput.addEventListener("input", () => autoSaveDayLog(dayKey));
         repsInput.addEventListener("input", () => autoSaveDayLog(dayKey));
 
@@ -1242,11 +1597,12 @@
         card.dataset.dayKey = dayKey;
 
         const lastLog = getLastExerciseLog(dayKey, name);
+        const isOptional = name.toLowerCase().includes("(optional");
 
         let lastSummary = "";
         if (lastLog && lastLog.sets && lastLog.sets.length > 0) {
             const s = lastLog.sets[lastLog.sets.length - 1];
-            lastSummary = `Last: ${formatWeight(s.weight)} ${currentUnit} × ${s.reps}`;
+            lastSummary = `Last: ${formatWeight(s.weight)} × ${s.reps}`;
         }
 
         card.innerHTML = `
@@ -1286,12 +1642,18 @@
             toggleBtn.textContent = collapsed ? "▶" : "▼";
         });
 
-        // Prefill sets from last workout (Option A)
+        // Prefill sets
+        const setsContainer = card.querySelector(".sets-container");
         if (lastLog && lastLog.sets && lastLog.sets.length > 0) {
             lastLog.sets.forEach(set => {
-                const row = addSetRow(card, false);
-                row.querySelector(".set-weight").value = set.weight;
-                row.querySelector(".set-reps").value = set.reps;
+                const autofill = {
+                    // For main lifts: weight + reps
+                    // For optional: weight only (Option B)
+                    weight: set.weight,
+                    reps: isOptional ? null : set.reps,
+                    type: null // type starts blank (Option C)
+                };
+                addSetRow(card, false, autofill);
             });
         } else {
             // Default to 2 blank sets
@@ -1422,6 +1784,7 @@
         const log = {
             day: dayKey,
             date: dateIso,
+            unit: currentUnit,
             exercises: []
         };
 
@@ -1430,11 +1793,12 @@
             const notes = card.querySelector(".exercise-notes").value.trim();
             const sets = [];
 
-            card.querySelectorAll(".set-row").forEach(row => {
+            card.querySelectorAll(".set-row").forEach((row, index) => {
+                const type = row.querySelector(".set-type").value;
                 const w = parseFloat(row.querySelector(".set-weight").value);
                 const r = parseInt(row.querySelector(".set-reps").value, 10);
                 if (isFinite(w) && w > 0 && Number.isFinite(r) && r > 0) {
-                    sets.push({ weight: w, reps: r });
+                    sets.push({ setNumber: index + 1, type, weight: w, reps: r });
                 }
             });
 
