@@ -1,86 +1,952 @@
-<div class="card">
-    <h2>Olympus Method — Training Split</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Olympus Method — Warm-Up & Log</title>
 
-    <h3>DAY 1 — PUSH (Chest / Shoulders / Triceps)</h3>
-    <p><strong>⚡ First exercise gets warm-ups (30%×5, 50%×5)</strong></p>
+<!-- Optional: Inter font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <ol>
-        <li><strong>Incline Barbell Bench Press</strong><br>
-            Warm-ups: ✔<br>
-            Working Sets: 6–10 + failure
-        </li>
+<style>
+    :root {
+        --az-dark: #1b1f23;
+        --az-bg: #264653;
+        --az-bg-soft: #287271;
+        --az-accent: #2a9d8f;
+        --az-yellow: #e9c46a;
+        --az-orange: #f4a261;
+        --az-salmon: #ee8959;
+        --az-red: #e76f51;
+        --radius: 14px;
+    }
 
-        <li><strong>Flat Barbell Bench Press</strong><br>
-            Working Sets: 6–10 Failure
-        </li>
+    * {
+        box-sizing: border-box;
+    }
 
-        <li><strong>Weighted Dips (Chest-focused)</strong><br>
-            Working Sets: 6–10 Failure
-        </li>
+    body {
+        margin: 0;
+        padding: 20px;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #264653 0, #0b0f10 55%);
+        color: #f7f7f7;
+    }
 
-        <li><strong>Dumbbell Lateral Raises</strong><br>
-            Working Sets: 10–15 Failure
-        </li>
+    .app {
+        max-width: 980px;
+        margin: 0 auto;
+        background: rgba(10, 14, 18, 0.95);
+        border-radius: 20px;
+        padding: 20px 20px 24px;
+        box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+        border: 1px solid rgba(233,196,106,0.18);
+    }
 
-        <li><strong>Optional:</strong> Rope Pushdown <em>or</em> Skull Crushers<br>
-            Working Sets: 8–12 Failure
-        </li>
-    </ol>
+    header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
 
-    <hr>
+    h1 {
+        font-size: 1.6rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-    <h3>DAY 2 — LEGS (Quads / Hams / Calves)</h3>
-    <p><strong>⚡ Warm-ups only for back squat</strong></p>
+    h1 span.logo-pill {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--az-accent);
+        color: #0b0f10;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
 
-    <ol>
-        <li><strong>Barbell Back Squat</strong><br>
-            Warm-ups: ✔<br>
-            Working Sets: 6–10 Failure
-        </li>
+    .tagline {
+        font-size: 0.85rem;
+        color: #c9d6df;
+        opacity: 0.9;
+    }
 
-        <li><strong>Romanian Deadlift</strong><br>
-            Working Sets: 6–10 Failure
-        </li>
+    /* Tabs */
+    .tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
 
-        <li><strong>Hamstring Curl (Machine)</strong><br>
-            Working Sets: 8–12 Failure
-        </li>
+    .tab-button {
+        border-radius: 999px;
+        padding: 6px 14px;
+        border: 1px solid rgba(148,163,184,0.6);
+        background: rgba(15,23,42,0.8);
+        color: #e5e7eb;
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
 
-        <li><strong>Calf Raises</strong><br>
-            Working Sets: 10–15 Failure
-        </li>
+    .tab-button.active {
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--az-orange), var(--az-red));
+        color: #0b0f10;
+        font-weight: 600;
+        box-shadow: 0 6px 14px rgba(231,111,81,0.45);
+    }
 
-        <li><strong>Optional:</strong> Leg Press or Hack Squat<br>
-            Working Sets: 8–12 Failure
-        </li>
-    </ol>
+    .tab-panel {
+        display: none;
+        margin-top: 4px;
+    }
 
-    <hr>
+    .tab-panel.active {
+        display: block;
+    }
 
-    <h3>DAY 3 — PULL (Back / Rear Delts / Biceps)</h3>
-    <p><strong>⚡ Warm-ups only for Weighted Pull-Ups</strong></p>
+    .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+        gap: 18px;
+    }
 
-    <ol>
-        <li><strong>Weighted Pull-Ups</strong><br>
-            BW × 5<br>
-            BW × 5<br>
-            Working Sets: 6–10 Failure
-        </li>
+    @media (max-width: 780px) {
+        .grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
 
-        <li><strong>Bent-Over Barbell Row</strong><br>
-            Working Sets: 6–10 Failure
-        </li>
+    .card {
+        background: linear-gradient(145deg, #101619, #172024);
+        border-radius: var(--radius);
+        padding: 16px 16px 18px;
+        border: 1px solid rgba(42,157,143,0.2);
+    }
 
-        <li><strong>Barbell Biceps Curl</strong><br>
-            Working Sets: 6–10 Failure
-        </li>
+    .card h2 {
+        margin: 0 0 8px;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
 
-        <li><strong>Rear Delt Flys</strong><br>
-            Working Sets: 10–15 Failure
-        </li>
+    .card h2 span.badge {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(244,162,97,0.15);
+        color: var(--az-yellow);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
 
-        <li><strong>Optional:</strong> Barbell Shrugs<br>
-            Working Sets: 8–12 Failure
-        </li>
-    </ol>
+    label {
+        display: block;
+        font-size: 0.8rem;
+        margin-top: 8px;
+        margin-bottom: 2px;
+        color: #e0e5ec;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    select, input[type="number"] {
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        border: 1px solid rgba(148,163,184,0.5);
+        background: #0b1114;
+        color: #f9fafb;
+        outline: none;
+    }
+
+    select:focus, input[type="number"]:focus {
+        border-color: var(--az-accent);
+        box-shadow: 0 0 0 1px rgba(42,157,143,0.7);
+    }
+
+    .row {
+        display: flex;
+        gap: 10px;
+    }
+
+    .row > div {
+        flex: 1;
+    }
+
+    .unit-toggle {
+        display: inline-flex;
+        background: #0b1114;
+        border-radius: 999px;
+        padding: 3px;
+        border: 1px solid rgba(148,163,184,0.6);
+    }
+
+    .unit-toggle button {
+        border: none;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        background: transparent;
+        color: #e5e7eb;
+    }
+
+    .unit-toggle button.active {
+        background: var(--az-accent);
+        color: #0b0f10;
+        font-weight: 600;
+    }
+
+    .btn-main {
+        width: 100%;
+        margin-top: 12px;
+        padding: 10px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, var(--az-orange), var(--az-red));
+        color: #0b0f10;
+        box-shadow: 0 10px 20px rgba(231,111,81,0.4);
+        transition: transform 0.05s ease, box-shadow 0.05s ease;
+    }
+
+    .btn-main:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 24px rgba(231,111,81,0.55);
+    }
+
+    .btn-main:active {
+        transform: translateY(0);
+        box-shadow: 0 6px 14px rgba(231,111,81,0.4);
+    }
+
+    .btn-secondary {
+        width: 100%;
+        margin-top: 10px;
+        padding: 9px;
+        border-radius: 999px;
+        border: 1px solid rgba(148,163,184,0.6);
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+        background: rgba(15,23,42,0.9);
+        color: #e5e7eb;
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--az-accent);
+    }
+
+    .sets-table {
+        margin-top: 6px;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+
+    .sets-table thead {
+        background: rgba(42,157,143,0.1);
+    }
+
+    .sets-table th,
+    .sets-table td {
+        padding: 6px 6px;
+        border-bottom: 1px solid rgba(55,65,81,0.6);
+        text-align: left;
+    }
+
+    .sets-table th {
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #e5e7eb;
+    }
+
+    .sets-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        border: 1px solid rgba(148,163,184,0.6);
+    }
+
+    .pill.work {
+        border-color: rgba(248,250,252,0.7);
+        color: var(--az-yellow);
+    }
+
+    .pill.warm {
+        border-color: rgba(56,189,248,0.7);
+        color: #bae6fd;
+    }
+
+    .empty-note {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        margin-top: 10px;
+    }
+
+    .footer-note {
+        margin-top: 14px;
+        font-size: 0.7rem;
+        color: #9ca3af;
+        opacity: 0.8;
+    }
+
+    .template-hint {
+        margin-top: 4px;
+        font-size: 0.75rem;
+        color: #cbd5f5;
+        opacity: 0.9;
+    }
+
+    .template-hint span {
+        color: var(--az-yellow);
+        font-weight: 600;
+    }
+
+    .chip-row {
+        margin-top: 6px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        font-size: 0.7rem;
+    }
+
+    .chip {
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(148,163,184,0.15);
+        border: 1px solid rgba(148,163,184,0.3);
+    }
+
+    .subsection-title {
+        margin-top: 12px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #e5e7eb;
+        opacity: 0.9;
+    }
+
+    /* Split tabs styling */
+    .day-title {
+        font-size: 1.05rem;
+        margin: 0 0 4px;
+    }
+
+    .day-subtitle {
+        font-size: 0.85rem;
+        color: #e5e7eb;
+        opacity: 0.9;
+        margin-bottom: 10px;
+    }
+
+    .split-list {
+        padding-left: 18px;
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
+
+    .split-list li {
+        margin-bottom: 6px;
+    }
+
+    hr.split-divider {
+        border: none;
+        border-top: 1px dashed rgba(148,163,184,0.4);
+        margin: 10px 0;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+    <header>
+        <div>
+            <h1>
+                Olympus Method
+                <span class="logo-pill">Arizona Sunset</span>
+            </h1>
+            <div class="tagline">
+                Heavy-Duty warm-ups, plates, and logbook — plus your full 3-day Push / Legs / Pull split.
+            </div>
+        </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-button active" data-target="tab-calculator">Calculator & Log</button>
+        <button class="tab-button" data-target="tab-push">Day 1 — Push</button>
+        <button class="tab-button" data-target="tab-legs">Day 2 — Legs</button>
+        <button class="tab-button" data-target="tab-pull">Day 3 — Pull</button>
+    </div>
+
+    <!-- TAB 1: CALCULATOR -->
+    <section id="tab-calculator" class="tab-panel active">
+        <div class="grid">
+            <!-- LEFT: Inputs -->
+            <div class="card">
+                <h2>
+                    Lift Setup
+                    <span class="badge">Input</span>
+                </h2>
+
+                <label for="liftSelect">Lift</label>
+                <select id="liftSelect">
+                    <option value="bench">Bench Press</option>
+                    <option value="squat">Back Squat</option>
+                    <option value="deadlift">Deadlift</option>
+                    <option value="ohp">Overhead Press</option>
+                    <option value="row">Barbell Row</option>
+                    <option value="pullups">Pull-Ups (weighted)</option>
+                    <option value="custom">Custom / Other</option>
+                </select>
+
+                <div class="row">
+                    <div>
+                        <label for="workingWeight">Working Set Weight</label>
+                        <input type="number" id="workingWeight" placeholder="e.g. 100" step="0.5" min="0" />
+                    </div>
+                    <div>
+                        <label>Unit</label>
+                        <div class="unit-toggle">
+                            <button type="button" id="kgBtn" class="active">kg</button>
+                            <button type="button" id="lbBtn">lb</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div>
+                        <label for="barWeight">Bar Weight</label>
+                        <input type="number" id="barWeight" placeholder="20 for kg / 45 for lb" step="0.5" min="0" />
+                    </div>
+                    <div>
+                        <label for="templateSelect">Warm-Up Template</label>
+                        <select id="templateSelect">
+                            <option value="heavyDuty">Heavy Duty (30% & 50%)</option>
+                            <option value="mentzer">Mike Mentzer</option>
+                            <option value="twoWarmups">2 Warm-Ups Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="template-hint" id="templateHint"></div>
+
+                <button class="btn-main" id="calcBtn">Calculate Warm-Ups & Plates</button>
+
+                <div class="subsection-title">Log Top Set</div>
+
+                <div class="row">
+                    <div>
+                        <label for="actualReps">Actual Reps (top set)</label>
+                        <input type="number" id="actualReps" placeholder="e.g. 8" min="0" step="1" />
+                    </div>
+                </div>
+
+                <button class="btn-secondary" id="saveSessionBtn">
+                    Save Session & Show Progression
+                </button>
+
+                <div class="chip-row">
+                    <div class="chip">Use warm-ups on the FIRST big lift of the day</div>
+                    <div class="chip">Accessories: usually straight to working set</div>
+                </div>
+
+                <div class="footer-note">
+                    For true Heavy Duty style: 2 brief warm-ups, then 1 all-out set to failure (6–10 reps).
+                </div>
+            </div>
+
+            <!-- RIGHT: Results -->
+            <div class="card">
+                <h2>
+                    Warm-Ups, Plates & Progression
+                    <span class="badge">Output</span>
+                </h2>
+
+                <table class="sets-table" id="resultsTable" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>Set</th>
+                            <th>Type</th>
+                            <th>% of Work</th>
+                            <th>Reps</th>
+                            <th>Target</th>
+                            <th>Plates / side</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody"></tbody>
+                </table>
+
+                <div class="empty-note" id="emptyNote">
+                    Enter your working weight & bar, choose a template, and hit <strong>Calculate</strong>.
+                </div>
+
+                <div id="previousStats" class="empty-note" style="display:none;"></div>
+                <div id="suggestionText" class="empty-note" style="display:none;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TAB 2: PUSH -->
+    <section id="tab-push" class="tab-panel">
+        <div class="card">
+            <h2>
+                Day 1 — Push
+                <span class="badge">Chest / Shoulders / Triceps</span>
+            </h2>
+            <p class="day-subtitle"><strong>⚡ First exercise gets warm-ups (30% × 5, 50% × 5)</strong></p>
+
+            <ol class="split-list">
+                <li>
+                    <strong>Incline Barbell Bench Press</strong><br>
+                    Warm-ups: ✔<br>
+                    Working Sets: 6–10 + failure
+                </li>
+
+                <li>
+                    <strong>Flat Barbell Bench Press</strong><br>
+                    Working Sets: 6–10 Failure
+                </li>
+
+                <li>
+                    <strong>Weighted Dips (Chest-focused)</strong><br>
+                    Working Sets: 6–10 Failure
+                </li>
+
+                <li>
+                    <strong>Dumbbell Lateral Raises</strong><br>
+                    Working Sets: 10–15 Failure
+                </li>
+
+                <li>
+                    <strong>Optional:</strong> Rope Pushdown <em>or</em> Skull Crushers<br>
+                    Working Sets: 8–12 Failure
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- TAB 3: LEGS -->
+    <section id="tab-legs" class="tab-panel">
+        <div class="card">
+            <h2>
+                Day 2 — Legs
+                <span class="badge">Quads / Hams / Calves</span>
+            </h2>
+            <p class="day-subtitle"><strong>⚡ Warm-ups only for back squat</strong></p>
+
+            <ol class="split-list">
+                <li>
+                    <strong>Barbell Back Squat</strong><br>
+                    Warm-ups: ✔<br>
+                    Working Sets: 6–10 Failure
+                </li>
+
+                <li>
+                    <strong>Romanian Deadlift</strong><br>
+                    Working Sets: 6–10 Failure
+                </li>
+
+                <li>
+                    <strong>Hamstring Curl (Machine)</strong><br>
+                    Working Sets: 8–12 Failure
+                </li>
+
+                <li>
+                    <strong>Calf Raises (Standing or Seated)</strong><br>
+                    Working Sets: 10–15 Failure
+                </li>
+
+                <li>
+                    <strong>Optional:</strong> Leg Press or Hack Squat<br>
+                    Working Sets: 8–12 Failure
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- TAB 4: PULL -->
+    <section id="tab-pull" class="tab-panel">
+        <div class="card">
+            <h2>
+                Day 3 — Pull
+                <span class="badge">Back / Rear Delts / Biceps</span>
+            </h2>
+            <p class="day-subtitle"><strong>⚡ Warm-ups only for Weighted Pull-Ups</strong></p>
+
+            <ol class="split-list">
+                <li>
+                    <strong>Weighted Pull-Ups</strong><br>
+                    Warm-ups (bodyweight only):<br>
+                    BW × 5<br>
+                    BW × 5<br>
+                    Working Sets: 6–10 Failure
+                </li>
+
+                <li>
+                    <strong>Bent-Over Barbell Row</strong><br>
+                    Working Sets: 6–10 Failure
+                </li>
+
+                <li>
+                    <strong>Barbell Biceps Curl</strong><br>
+                    Working Sets: 6–10 Failure
+                </li>
+
+                <li>
+                    <strong>Rear Delt Flys</strong><br>
+                    Working Sets: 10–15 Failure
+                </li>
+
+                <li>
+                    <strong>Optional:</strong> Barbell Shrugs<br>
+                    Working Sets: 8–12 Failure
+                </li>
+            </ol>
+        </div>
+    </section>
 </div>
+
+<script>
+    // ---- Tabs ----
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabPanels = document.querySelectorAll(".tab-panel");
+
+    tabButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const target = btn.getAttribute("data-target");
+
+            tabButtons.forEach(b => b.classList.remove("active"));
+            tabPanels.forEach(p => p.classList.remove("active"));
+
+            btn.classList.add("active");
+            document.getElementById(target).classList.add("active");
+        });
+    });
+
+    // ---- Warm-up logic / calculator ----
+    const TEMPLATES = {
+        heavyDuty: {
+            name: "Heavy Duty (30% & 50%)",
+            description: "Olympus-style: 30% x 5, 50% x 3–5, then 100% x 6–10 to failure.",
+            sets: [
+                { type: "Warm-up", percent: 0.30, reps: "5" },
+                { type: "Warm-up", percent: 0.50, reps: "3–5" },
+                { type: "Working", percent: 1.00, reps: "6–10 (to failure)" }
+            ]
+        },
+        mentzer: {
+            name: "Mike Mentzer",
+            description: "Classic low-volume: 50% x 6–8, 75% x 3–4, 100% x 6–10 to failure.",
+            sets: [
+                { type: "Warm-up", percent: 0.50, reps: "6–8" },
+                { type: "Warm-up", percent: 0.75, reps: "3–4" },
+                { type: "Working", percent: 1.00, reps: "6–10 (to failure)" }
+            ]
+        },
+        twoWarmups: {
+            name: "2 Warm-Ups Only (Minimalist)",
+            description: "40% x 5, 70% x 2–3, then 100% working set.",
+            sets: [
+                { type: "Warm-up", percent: 0.40, reps: "5" },
+                { type: "Warm-up", percent: 0.70, reps: "2–3" },
+                { type: "Working", percent: 1.00, reps: "6–10 (to failure)" }
+            ]
+        }
+    };
+
+    const KG_PLATES = [25, 20, 15, 10, 5, 2.5, 1.25];
+    const LB_PLATES = [45, 35, 25, 10, 5, 2.5];
+
+    let currentUnit = "kg";
+
+    const liftSelect = document.getElementById("liftSelect");
+    const workingWeightInput = document.getElementById("workingWeight");
+    const barWeightInput = document.getElementById("barWeight");
+    const templateSelect = document.getElementById("templateSelect");
+    const templateHint = document.getElementById("templateHint");
+    const resultsTable = document.getElementById("resultsTable");
+    const resultsBody = document.getElementById("resultsBody");
+    const emptyNote = document.getElementById("emptyNote");
+    const kgBtn = document.getElementById("kgBtn");
+    const lbBtn = document.getElementById("lbBtn");
+    const calcBtn = document.getElementById("calcBtn");
+    const saveSessionBtn = document.getElementById("saveSessionBtn");
+    const actualRepsInput = document.getElementById("actualReps");
+    const previousStatsDiv = document.getElementById("previousStats");
+    const suggestionTextDiv = document.getElementById("suggestionText");
+
+    function updateTemplateHint() {
+        const tKey = templateSelect.value;
+        const t = TEMPLATES[tKey];
+        if (!t) {
+            templateHint.textContent = "";
+            return;
+        }
+        templateHint.innerHTML = `<span>${t.name}:</span> ${t.description}`;
+    }
+
+    templateSelect.addEventListener("change", updateTemplateHint);
+    updateTemplateHint();
+
+    kgBtn.addEventListener("click", () => setUnit("kg"));
+    lbBtn.addEventListener("click", () => setUnit("lb"));
+
+    function setUnit(unit) {
+        currentUnit = unit;
+        if (unit === "kg") {
+            kgBtn.classList.add("active");
+            lbBtn.classList.remove("active");
+            if (!barWeightInput.value) barWeightInput.value = 20;
+        } else {
+            lbBtn.classList.add("active");
+            kgBtn.classList.remove("active");
+            if (!barWeightInput.value) barWeightInput.value = 45;
+        }
+    }
+
+    function formatWeight(value) {
+        if (!isFinite(value)) return "-";
+        return value.toFixed(1).replace(/\.0$/, "");
+    }
+
+    function plateConfig() {
+        return currentUnit === "kg" ? KG_PLATES : LB_PLATES;
+    }
+
+    function computePlates(targetWeight, barWeight) {
+        const plateSizes = plateConfig();
+        const epsilon = 1e-6;
+
+        if (targetWeight < barWeight - epsilon) {
+            return { text: "Bar only", raw: [] };
+        }
+
+        let remainingTotal = targetWeight - barWeight;
+        if (remainingTotal < 0) remainingTotal = 0;
+
+        let perSide = remainingTotal / 2;
+        const platesPerSide = [];
+
+        for (const p of plateSizes) {
+            let count = Math.floor((perSide + epsilon) / p);
+            if (count > 0) {
+                platesPerSide.push({ size: p, count });
+                perSide -= count * p;
+            }
+        }
+
+        if (platesPerSide.length === 0) {
+            return { text: "Bar only", raw: [] };
+        }
+
+        const text = platesPerSide
+            .map(pl => `${formatWeight(pl.size)} × ${pl.count}`)
+            .join(", ");
+
+        return { text: text + " / side", raw: platesPerSide };
+    }
+
+    function calculateWarmups() {
+        const work = parseFloat(workingWeightInput.value);
+        const bar = parseFloat(barWeightInput.value);
+
+        if (!isFinite(work) || work <= 0) {
+            alert("Enter a valid working set weight.");
+            return;
+        }
+        if (!isFinite(bar) || bar <= 0) {
+            alert("Enter a valid bar weight.");
+            return;
+        }
+
+        const tKey = templateSelect.value;
+        const tpl = TEMPLATES[tKey];
+        if (!tpl) return;
+
+        resultsBody.innerHTML = "";
+
+        tpl.sets.forEach((set, index) => {
+            const setNumber = index + 1;
+            const target = work * set.percent;
+            const plates = computePlates(target, bar);
+
+            const tr = document.createElement("tr");
+
+            const tdSet = document.createElement("td");
+            tdSet.textContent = setNumber;
+
+            const tdType = document.createElement("td");
+            const pill = document.createElement("span");
+            pill.className = "pill " + (set.type === "Working" ? "work" : "warm");
+            pill.textContent = set.type;
+            tdType.appendChild(pill);
+
+            const tdPercent = document.createElement("td");
+            tdPercent.textContent = Math.round(set.percent * 100) + "%";
+
+            const tdReps = document.createElement("td");
+            tdReps.textContent = set.reps;
+
+            const tdTarget = document.createElement("td");
+            tdTarget.textContent = `${formatWeight(target)} ${currentUnit}`;
+
+            const tdPlates = document.createElement("td");
+            tdPlates.textContent = plates.text;
+
+            tr.appendChild(tdSet);
+            tr.appendChild(tdType);
+            tr.appendChild(tdPercent);
+            tr.appendChild(tdReps);
+            tr.appendChild(tdTarget);
+            tr.appendChild(tdPlates);
+
+            resultsBody.appendChild(tr);
+        });
+
+        resultsTable.style.display = "table";
+        emptyNote.style.display = "none";
+    }
+
+    calcBtn.addEventListener("click", calculateWarmups);
+
+    // ---- Local log in localStorage ----
+    const LOG_KEY = "olympusLogs_v1";
+
+    function loadLogs() {
+        try {
+            const raw = localStorage.getItem(LOG_KEY);
+            if (!raw) return [];
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed)) return [];
+            return parsed;
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveLogs(logs) {
+        localStorage.setItem(LOG_KEY, JSON.stringify(logs));
+    }
+
+    function getIncrement(unit) {
+        return unit === "kg" ? 2.5 : 5;
+    }
+
+    function suggestNextWeight(weight, reps, unit) {
+        const inc = getIncrement(unit);
+        if (reps >= 10) return weight + inc;
+        if (reps <= 5) return Math.max(0, weight - inc);
+        return weight;
+    }
+
+    function formatDateShort(iso) {
+        const d = new Date(iso);
+        if (!isFinite(d.getTime())) return "";
+        return d.toLocaleDateString(undefined, { day: "2-digit", month: "2-digit" });
+    }
+
+    function updateProgressSection(lift, unit) {
+        const logs = loadLogs()
+            .filter(l => l.lift === lift && l.unit === unit)
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        if (logs.length < 2) {
+            previousStatsDiv.style.display = "block";
+            suggestionTextDiv.style.display = "block";
+            previousStatsDiv.textContent = "Not enough history yet. Log at least two sessions for this lift to see weekly comparison.";
+            suggestionTextDiv.textContent = "";
+            return;
+        }
+
+        const prev = logs[logs.length - 2];
+        const current = logs[logs.length - 1];
+
+        const prevStr = `${formatWeight(prev.weight)} ${unit} × ${prev.reps} reps`;
+        const currStr = `${formatWeight(current.weight)} ${unit} × ${current.reps} reps`;
+
+        const dayDiffMs = new Date(current.date) - new Date(prev.date);
+        const dayDiff = dayDiffMs / (1000 * 60 * 60 * 24);
+
+        let weekText = "";
+        if (dayDiff > 5 && dayDiff < 9) {
+            weekText = " (~1 week apart)";
+        }
+
+        previousStatsDiv.style.display = "block";
+        previousStatsDiv.innerHTML =
+            `Last session for this lift: <strong>${prevStr</strong> on ${formatDateShort(prev.date)}.<br>` +
+            `Current session: <strong>${currStr}</strong> on ${formatDateShort(current.date)}${weekText}.`;
+
+        const suggested = suggestNextWeight(current.weight, current.reps, unit);
+
+        suggestionTextDiv.style.display = "block";
+        suggestionTextDiv.innerHTML =
+            `Suggested next working weight: <strong>${formatWeight(suggested)} ${unit}</strong> ` +
+            `(based on ${current.reps} reps this session).`;
+    }
+
+    function saveSession() {
+        const work = parseFloat(workingWeightInput.value);
+        const reps = parseInt(actualRepsInput.value, 10);
+        const lift = liftSelect.value;
+
+        if (!isFinite(work) || work <= 0) {
+            alert("Enter a valid working set weight before logging.");
+            return;
+        }
+        if (!Number.isFinite(reps) || reps <= 0) {
+            alert("Enter the actual reps you achieved on your top set.");
+            return;
+        }
+
+        const logs = loadLogs();
+        logs.push({
+            date: new Date().toISOString(),
+            lift: lift,
+            unit: currentUnit,
+            weight: work,
+            reps: reps
+        });
+        saveLogs(logs);
+
+        updateProgressSection(lift, currentUnit);
+        alert("Session saved for " + lift.toUpperCase() + "!");
+    }
+
+    saveSessionBtn.addEventListener("click", saveSession);
+
+    // Defaults
+    setUnit("kg");
+    barWeightInput.value = 20;
+</script>
+
+</body>
+</html>
