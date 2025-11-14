@@ -68,6 +68,7 @@
       display: flex;
       gap: 16px;
       font-size: 0.9rem;
+      flex-wrap: wrap;
     }
 
     .nav-tab {
@@ -197,6 +198,12 @@
       font-weight: 600;
     }
 
+    /* improve contrast for active day tab in dark mode */
+    body.dark-theme .day-tab.active {
+      background-color: #3b82f6;
+      color: #ffffff;
+    }
+
     .day-panel {
       display: none;
     }
@@ -212,11 +219,12 @@
     .exercise-card {
       background-color: var(--card);
       border-radius: 10px;
-      padding: 12px;
+      padding: 10px 10px 8px;
       margin-bottom: 10px;
       border: 1px solid var(--border);
       cursor: grab;
-      transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+      transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, max-height 0.25s ease;
+      position: relative;
     }
 
     .exercise-card.dragging {
@@ -235,12 +243,36 @@
     .exercise-title {
       font-size: 0.95rem;
       font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .exercise-title .collapse-icon {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .exercise-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .drag-handle {
       font-size: 1.1rem;
       cursor: grab;
       color: var(--muted);
+    }
+
+    .exercise-menu-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--muted);
+      padding: 0 4px;
     }
 
     .exercise-stats {
@@ -254,6 +286,22 @@
 
     .exercise-stats span strong {
       color: var(--text);
+    }
+
+    .exercise-body {
+      overflow: hidden;
+      transition: max-height 0.25s ease, opacity 0.2s ease;
+    }
+
+    .exercise-card.collapsed .exercise-body {
+      max-height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .exercise-card:not(.collapsed) .exercise-body {
+      max-height: 600px; /* enough for sets + history */
+      opacity: 1;
     }
 
     .sets-table {
@@ -497,6 +545,15 @@
       opacity: 1;
     }
 
+    /* Add Exercise button */
+    .add-exercise-global {
+      margin-top: 8px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.8rem;
+      border-style: dashed;
+    }
+
     @media (max-width: 600px) {
       .summary-bar.active {
         align-items: flex-start;
@@ -517,6 +574,7 @@
       <div class="top-nav">
         <div class="nav-tabs">
           <div class="nav-tab active" data-tab="workout">WORKOUT</div>
+          <div class="nav-tab" data-tab="calculators">CALCULATORS</div>
           <div class="nav-tab" data-tab="progress">PROGRESS</div>
           <div class="nav-tab" data-tab="settings">SETTINGS</div>
         </div>
@@ -552,13 +610,31 @@
 
         <div id="day1" class="day-panel active">
           <div class="exercise-list" data-day="day1"></div>
+          <button class="btn add-exercise-global" data-day="day1">+ Add Exercise</button>
         </div>
         <div id="day2" class="day-panel">
           <div class="exercise-list" data-day="day2"></div>
+          <button class="btn add-exercise-global" data-day="day2">+ Add Exercise</button>
         </div>
         <div id="day3" class="day-panel">
           <div class="exercise-list" data-day="day3"></div>
+          <button class="btn add-exercise-global" data-day="day3">+ Add Exercise</button>
         </div>
+      </section>
+
+      <!-- CALCULATORS TAB (placeholder for now) -->
+      <section class="main-tab" id="tab-calculators">
+        <h2 style="font-size:1rem;margin-bottom:8px;">Calculators</h2>
+        <p class="muted" style="font-size:0.8rem;margin-bottom:10px;">
+          Warm-up, 1RM, working weight and standards calculators will live here.
+        </p>
+        <ul style="font-size:0.85rem;padding-left:18px;">
+          <li>1RM Calculator</li>
+          <li>Warm-up Set Calculator (Olympus / Mentzer / Soviet)</li>
+          <li>Working Weight from % of 1RM</li>
+          <li>Plate Math (per side)</li>
+          <li>Strength Standards (Good / Great / Godlike)</li>
+        </ul>
       </section>
 
       <!-- PROGRESS TAB -->
@@ -676,9 +752,9 @@
     });
 
     /********************
-     * EXERCISE DATA
+     * EXERCISE DATA (DEFAULT OLYMPUS)
      ********************/
-    const dayExercises = {
+    const defaultDayExercises = {
       day1: [
         'Incline Bench Press',
         'Weighted Dips',
@@ -706,6 +782,32 @@
 
     function slugify(name) {
       return name.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+    }
+
+    /********************
+     * ROUTINE PERSISTENCE (per day)
+     ********************/
+    function getRoutine(dayKey) {
+      const key = "routine_" + dayKey;
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+      // fallback: default exercises
+      return defaultDayExercises[dayKey].map(name => ({ type: 'exercise', name }));
+    }
+
+    function saveRoutine(dayKey) {
+      const listEl = document.querySelector(`.exercise-list[data-day="${dayKey}"]`);
+      if (!listEl) return;
+      const routine = [];
+      listEl.querySelectorAll('.exercise-card').forEach(card => {
+        routine.push({
+          type: 'exercise',      // v1: only single exercises; superset can be refined later
+          name: card.dataset.exerciseName || ''
+        });
+      });
+      localStorage.setItem("routine_" + dayKey, JSON.stringify(routine));
     }
 
     /********************
@@ -806,7 +908,6 @@
     pauseWorkoutBtn.addEventListener('click', () => {
       if (!workoutState.started || workoutState.cancelled) return;
       if (workoutState.paused) {
-        // resume
         workoutState.paused = false;
         if (workoutState.pauseStart) {
           const now = Date.now();
@@ -815,7 +916,6 @@
         }
         pauseWorkoutBtn.textContent = '⏸ Pause';
       } else {
-        // pause
         workoutState.paused = true;
         workoutState.pauseStart = Date.now();
         pauseWorkoutBtn.textContent = '▶ Resume';
@@ -951,7 +1051,6 @@
       if (newPRs.length > 0) {
         savePR(exId, pr);
 
-        // Row badge
         const lastTd = row.querySelector('td:last-child');
         const badgeWrap = document.createElement("span");
         badgeWrap.style.marginLeft = "6px";
@@ -960,7 +1059,6 @@
         badgeWrap.textContent = newPRs.join(" + ");
         lastTd.appendChild(badgeWrap);
 
-        // Toast + history
         newPRs.forEach(type => {
           showToast("🔥 NEW " + type + "!");
           let val;
@@ -989,42 +1087,50 @@
 
       card.innerHTML = `
         <div class="exercise-header">
-          <div class="exercise-title">${exerciseName}</div>
-          <div class="drag-handle">⋮⋮</div>
+          <div class="exercise-title">
+            <span class="collapse-icon">▼</span>
+            <span class="exercise-name-text">${exerciseName}</span>
+          </div>
+          <div class="exercise-actions">
+            <button class="exercise-menu-btn" title="Edit">⋯</button>
+            <span class="drag-handle">⋮⋮</span>
+          </div>
         </div>
         <div class="exercise-stats">
           <span class="stat-volume">Volume: <strong data-ex-stat="volume">0</strong> kg</span>
           <span class="stat-1rm">Est. 1RM: <strong data-ex-stat="onerm">-</strong></span>
         </div>
-        <table class="sets-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Weight</th>
-              <th>Reps</th>
-              <th>Done</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr data-set-index="1">
-              <td>1</td>
-              <td><input type="number" class="weight-input" min="0" step="0.5" /></td>
-              <td><input type="number" class="reps-input" min="0" step="1" /></td>
-              <td><button class="set-done-btn">✔</button></td>
-            </tr>
-            <tr data-set-index="2">
-              <td>2</td>
-              <td><input type="number" class="weight-input" min="0" step="0.5" /></td>
-              <td><input type="number" class="reps-input" min="0" step="1" /></td>
-              <td><button class="set-done-btn">✔</button></td>
-            </tr>
-          </tbody>
-        </table>
-        <button class="add-set-btn">+ Add Set</button>
-        <details class="pr-history">
-          <summary>PR History</summary>
-          <div class="pr-history-body"></div>
-        </details>
+        <div class="exercise-body">
+          <table class="sets-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Weight</th>
+                <th>Reps</th>
+                <th>Done</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-set-index="1">
+                <td>1</td>
+                <td><input type="number" class="weight-input" min="0" step="0.5" /></td>
+                <td><input type="number" class="reps-input" min="0" step="1" /></td>
+                <td><button class="set-done-btn">✔</button></td>
+              </tr>
+              <tr data-set-index="2">
+                <td>2</td>
+                <td><input type="number" class="weight-input" min="0" step="0.5" /></td>
+                <td><input type="number" class="reps-input" min="0" step="1" /></td>
+                <td><button class="set-done-btn">✔</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <button class="add-set-btn">+ Add Set</button>
+          <details class="pr-history">
+            <summary>PR History</summary>
+            <div class="pr-history-body"></div>
+          </details>
+        </div>
       `;
       listEl.appendChild(card);
 
@@ -1045,7 +1151,23 @@
         addNewSetRow(card);
       });
 
-      // Load PR history collapsed by default
+      // Collapsible title
+      const titleEl = card.querySelector('.exercise-title');
+      titleEl.addEventListener('click', (e) => {
+        // Ignore clicks on menu / drag
+        if (e.target.classList.contains('exercise-menu-btn') || e.target.classList.contains('drag-handle')) return;
+        card.classList.toggle('collapsed');
+        const icon = card.querySelector('.collapse-icon');
+        icon.textContent = card.classList.contains('collapsed') ? '▶' : '▼';
+      });
+
+      // Menu button
+      const menuBtn = card.querySelector('.exercise-menu-btn');
+      menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openExerciseMenu(card);
+      });
+
       renderExercisePRHistory(exId, card);
 
       return card;
@@ -1081,7 +1203,6 @@
       rows.forEach(row => {
         const done = row.classList.contains('completed');
 
-        // Warm-up vs working styling
         if (done) {
           row.classList.add('set-row-working');
           row.classList.remove('set-row-warmup');
@@ -1090,7 +1211,7 @@
           row.classList.add('set-row-warmup');
         }
 
-        if (!done) return; // ignore warm-ups & incomplete sets
+        if (!done) return;
 
         const weight = parseFloat(row.querySelector('.weight-input')?.value || '0');
         const repsRaw = parseInt(row.querySelector('.reps-input')?.value || '0', 10);
@@ -1108,7 +1229,6 @@
         }
       });
 
-      // Clear previous top highlight then add new one
       rows.forEach(r => r.classList.remove('set-row-top'));
       if (best1RM_row) {
         best1RM_row.classList.add('set-row-top');
@@ -1151,7 +1271,6 @@
         row.classList.add('completed');
         workoutState.totalSetsCompleted += 1;
 
-        // PR check only when marking as done
         const exId = card.dataset.exerciseId;
         const exerciseName = card.dataset.exerciseName;
         const repsFor1RM = Math.min(repsRaw, 10);
@@ -1161,7 +1280,6 @@
         checkAndApplyPRs(exId, exerciseName, weight, repsRaw, est1RM, setVolume, row, card);
 
       } else {
-        // un-do
         btn.classList.remove('done');
         row.classList.remove('completed', 'set-row-working', 'set-row-top');
         workoutState.totalSetsCompleted = Math.max(workoutState.totalSetsCompleted - 1, 0);
@@ -1189,13 +1307,10 @@
       remaining: 0,
       timerId: null
     };
-    const restDefaults = {}; // exId -> per-ex default if needed
+    const restDefaults = {};
 
     function startRestTimerForExercise(exId, exName) {
       const defaultSec = restDefaults[exId] || 90;
-      if (restState.activeExerciseId && restState.activeExerciseId !== exId) {
-        // could store old timer if we ever want multiple
-      }
       restState.activeExerciseId = exId;
       restState.remaining = defaultSec;
       restNameEl.textContent = 'RESTING — ' + exName;
@@ -1255,6 +1370,7 @@
         card.classList.remove('dragging');
         draggedCard = null;
         saveExerciseOrder(list.dataset.day);
+        saveRoutine(list.dataset.day);
       });
 
       list.addEventListener('dragover', e => {
@@ -1307,6 +1423,106 @@
     }
 
     /********************
+     * EXERCISE MENU (Rename / Replace / Delete / Superset v1)
+     ********************/
+    function openExerciseMenu(card) {
+      const exName = card.dataset.exerciseName;
+      const action = prompt(
+        `Edit "${exName}"\n\nChoose an option:\n1 = Rename\n2 = Replace\n3 = Delete\n4 = Add to Superset (v1: combine names)`,
+        "1"
+      );
+      if (!action) return;
+      const dayKey = card.closest('.exercise-list').dataset.day;
+
+      if (action === "1") {
+        const newName = prompt("New name for this exercise:", exName);
+        if (newName && newName.trim()) {
+          const trimmed = newName.trim();
+          card.dataset.exerciseName = trimmed;
+          card.dataset.exerciseId = slugify(trimmed);
+          card.querySelector('.exercise-name-text').textContent = trimmed;
+          saveRoutine(dayKey);
+        }
+      } else if (action === "2") {
+        const allNames = getAllExerciseNames(dayKey);
+        const listStr = allNames.join(", ");
+        const repName = prompt(
+          `Type a new exercise name or choose from:\n${listStr}`,
+          exName
+        );
+        if (repName && repName.trim()) {
+          const trimmed = repName.trim();
+          card.dataset.exerciseName = trimmed;
+          card.dataset.exerciseId = slugify(trimmed);
+          card.querySelector('.exercise-name-text').textContent = trimmed;
+          saveRoutine(dayKey);
+        }
+      } else if (action === "3") {
+        const ok = confirm(`Delete "${exName}" from this routine?`);
+        if (ok) {
+          card.remove();
+          calculateTotalPlannedSets();
+          saveRoutine(dayKey);
+          updateAllExerciseStats();
+        }
+      } else if (action === "4") {
+        addToSupersetSimple(card);
+        saveRoutine(dayKey);
+      }
+    }
+
+    function getAllExerciseNames(dayKey) {
+      const listEl = document.querySelector(`.exercise-list[data-day="${dayKey}"]`);
+      return [...listEl.querySelectorAll('.exercise-card')].map(c => c.dataset.exerciseName);
+    }
+
+    // Superset v1 (simple): combine this exercise + another into a single card name
+    function addToSupersetSimple(card) {
+      const dayKey = card.closest('.exercise-list').dataset.day;
+      const listEl = document.querySelector(`.exercise-list[data-day="${dayKey}"]`);
+      const cards = [...listEl.querySelectorAll('.exercise-card')];
+      if (cards.length < 2) {
+        alert("You need at least two exercises in this day to create a superset.");
+        return;
+      }
+
+      const currentName = card.dataset.exerciseName;
+      const others = cards
+        .filter(c => c !== card)
+        .map(c => c.dataset.exerciseName);
+      if (!others.length) {
+        alert("No other exercise to pair with.");
+        return;
+      }
+
+      const choice = prompt(
+        `Create superset with "${currentName}".\nChoose another exercise by typing its name:\n` +
+        others.join(", ")
+      );
+      if (!choice) return;
+
+      const selectedName = choice.trim();
+      const partnerCard = cards.find(c => c.dataset.exerciseName === selectedName);
+      if (!partnerCard) {
+        alert("Exercise not found. Make sure you typed the name exactly.");
+        return;
+      }
+
+      // v1 behavior: merge into a single combined card (name only)
+      const combinedName = `Superset: ${currentName} + ${selectedName}`;
+      card.dataset.exerciseName = combinedName;
+      card.dataset.exerciseId = slugify(combinedName);
+      card.querySelector('.exercise-name-text').textContent = combinedName;
+
+      // remove the partner card (user can create their own superset structure with combined sets)
+      partnerCard.remove();
+
+      calculateTotalPlannedSets();
+      updateAllExerciseStats();
+      showToast("Superset created (v1 – combined card).");
+    }
+
+    /********************
      * PROGRESS TAB
      ********************/
     const progressList = document.getElementById('progressList');
@@ -1336,16 +1552,36 @@
     }
 
     /********************
+     * ADD EXERCISE BUTTON
+     ********************/
+    document.querySelectorAll('.add-exercise-global').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dayKey = btn.dataset.day;
+        const name = prompt("Name of the new exercise:");
+        if (!name || !name.trim()) return;
+        const trimmed = name.trim();
+        createExerciseCard(dayKey, trimmed);
+        calculateTotalPlannedSets();
+        updateAllExerciseStats();
+        saveRoutine(dayKey);
+      });
+    });
+
+    /********************
      * INITIALIZATION
      ********************/
     function initExercises() {
-      Object.keys(dayExercises).forEach(dayKey => {
-        const names = dayExercises[dayKey];
-        names.forEach(name => createExerciseCard(dayKey, name));
+      Object.keys(defaultDayExercises).forEach(dayKey => {
+        const routine = getRoutine(dayKey); // either saved or default
+        routine.forEach(block => {
+          if (block.type === 'exercise') {
+            createExerciseCard(dayKey, block.name);
+          }
+        });
       });
       calculateTotalPlannedSets();
       updateAllExerciseStats();
-      Object.keys(dayExercises).forEach(dayKey => loadExerciseOrder(dayKey));
+      Object.keys(defaultDayExercises).forEach(dayKey => loadExerciseOrder(dayKey));
     }
 
     initExercises();
