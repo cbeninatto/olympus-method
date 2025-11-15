@@ -1,115 +1,119 @@
-// app.js v1 — Olympus Method
+// =========================
+// THEME & UNIT TOGGLES
+// =========================
 
-// ===============================
-//   GLOBAL STATE & HELPERS
-// ===============================
-let currentUnit = "kg"; // "kg" or "lb"
-const STORAGE_KEY = "olympus_method_logs_v1";
+const THEME_KEY = "olympus_themeMode";
+const UNIT_KEY = "olympus_unit";
+const DAY_LOG_KEY = "olympusDayLogs_v1";
 
-function $(id) {
-    return document.getElementById(id);
+let currentUnit = "kg";
+
+// Apply theme class to body (light / dark / auto)
+function applyTheme(mode) {
+    const body = document.body;
+    body.classList.remove("light", "dark", "auto");
+    if (!["light", "dark", "auto"].includes(mode)) mode = "auto";
+    body.classList.add(mode);
+    localStorage.setItem(THEME_KEY, mode);
 }
 
-function loadLogs() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
-    } catch {
-        return [];
+// Init theme
+function initTheme() {
+    const saved = localStorage.getItem(THEME_KEY) || "auto";
+    const themeSelect = document.getElementById("themeMode");
+    themeSelect.value = saved;
+    applyTheme(saved);
+
+    themeSelect.addEventListener("change", () => {
+        applyTheme(themeSelect.value);
+    });
+}
+
+// Apply unit (kg/lb)
+function setUnit(unit) {
+    currentUnit = unit === "lb" ? "lb" : "kg";
+    localStorage.setItem(UNIT_KEY, currentUnit);
+
+    const unitSelector = document.getElementById("unitSelector");
+    if (unitSelector) unitSelector.value = currentUnit;
+
+    const barWeightInput = document.getElementById("barWeight");
+    if (barWeightInput && !barWeightInput.value) {
+        barWeightInput.value = currentUnit === "kg" ? 20 : 45;
     }
 }
 
-function saveLogs(logs) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+// Init unit toggle
+function initUnit() {
+    const saved = localStorage.getItem(UNIT_KEY) || "kg";
+    setUnit(saved);
+
+    const unitSelector = document.getElementById("unitSelector");
+    unitSelector.addEventListener("change", () => {
+        setUnit(unitSelector.value);
+    });
 }
 
-// Find last log for a specific day+exercise
-function getLastExerciseLog(dayKey, exerciseName) {
-    const logs = loadLogs();
-    for (let i = logs.length - 1; i >= 0; i--) {
-        const log = logs[i];
-        if (log.day !== dayKey) continue;
-        const ex = log.exercises.find(e => e.name === exerciseName);
-        if (ex && ex.sets && ex.sets.length > 0) return ex;
-    }
-    return null;
-}
+// =========================
+// TABS
+// =========================
 
-// Find last date used for a specific day
-function getLastDayDate(dayKey) {
-    const logs = loadLogs();
-    for (let i = logs.length - 1; i >= 0; i--) {
-        if (logs[i].day === dayKey && logs[i].date) {
-            return logs[i].date.slice(0, 10); // YYYY-MM-DD
-        }
-    }
-    return null;
-}
-
-// Format helpers
-function format1(x) {
-    if (!isFinite(x)) return "-";
-    return Number(x.toFixed(1)).toString();
-}
-function format2(x) {
-    if (!isFinite(x)) return "-";
-    return x.toFixed(2);
-}
-
-// ===============================
-//   TABS
-// ===============================
 function initTabs() {
-    const tabBtns = document.querySelectorAll(".tab-btn");
-    const tabContents = document.querySelectorAll(".tab-content");
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const panels = document.querySelectorAll(".tab-panel");
 
-    tabBtns.forEach(btn => {
+    tabButtons.forEach(btn => {
         btn.addEventListener("click", () => {
-            const target = btn.dataset.tab;
-
-            tabBtns.forEach(b => b.classList.remove("active"));
-            tabContents.forEach(c => c.classList.remove("active"));
+            const targetId = btn.dataset.tab;
+            tabButtons.forEach(b => b.classList.remove("active"));
+            panels.forEach(p => p.classList.remove("active"));
 
             btn.classList.add("active");
-            document.getElementById(target).classList.add("active");
+            const targetPanel = document.getElementById(targetId);
+            if (targetPanel) targetPanel.classList.add("active");
         });
     });
 }
 
-// ===============================
-//   UNIT SELECTOR
-// ===============================
-function initUnitSelector() {
-    const unitSelector = $("unitSelector");
-    const barWeightInput = $("barWeight");
+// =========================
+// PHYSIQUE STANDARDS
+// =========================
 
-    unitSelector.addEventListener("change", () => {
-        currentUnit = unitSelector.value;
-        if (currentUnit === "kg" && (!barWeightInput.value || barWeightInput.value === "45")) {
-            barWeightInput.value = 20;
-        } else if (currentUnit === "lb" && (!barWeightInput.value || barWeightInput.value === "20")) {
-            barWeightInput.value = 45;
-        }
-    });
-
-    currentUnit = unitSelector.value;
+function bandLabel(band) {
+    switch (band) {
+        case "good": return "Good";
+        case "great": return "Great";
+        case "godlike": return "Godlike";
+        default: return "Below Good";
+    }
 }
 
-// ===============================
-//   PHYSIQUE STANDARDS
-// ===============================
+function bandClass(band) {
+    switch (band) {
+        case "good": return "score-good";
+        case "great": return "score-great";
+        case "godlike": return "score-godlike";
+        default: return "score-below";
+    }
+}
+
+// Waist / height ratio
 function classifyWaistRatio(r) {
     if (r <= 0.45) return "godlike";
     if (r <= 0.46) return "great";
     if (r <= 0.47) return "good";
     return "below";
 }
+
+// Chest / waist
 function classifyChestWaist(r) {
     if (r >= 1.40) return "godlike";
     if (r >= 1.35) return "great";
     if (r >= 1.30) return "good";
     return "below";
 }
+
+// Arms / waist
 function classifyArmsWaist(r) {
     if (r >= 0.50) return "godlike";
     if (r >= 0.48) return "great";
@@ -117,100 +121,92 @@ function classifyArmsWaist(r) {
     return "below";
 }
 
-function bandLabel(b) {
-    switch (b) {
-        case "good": return "Good";
-        case "great": return "Great";
-        case "godlike": return "Godlike";
-        default: return "Below Good";
-    }
-}
-function bandClass(b) {
-    switch (b) {
-        case "good": return "result-good";
-        case "great": return "result-great";
-        case "godlike": return "result-godlike";
-        default: return "result-below";
-    }
-}
-
-function initBodyCalculator() {
-    const btn = $("calcBodyBtn");
-    const out = $("bodyResults");
+function initBodyStandards() {
+    const heightInput = document.getElementById("heightInput");
+    const waistInput = document.getElementById("waistInput");
+    const chestInput = document.getElementById("chestInput");
+    const armsInput = document.getElementById("armsInput");
+    const btn = document.getElementById("calcBodyBtn");
+    const output = document.getElementById("bodyResults");
 
     btn.addEventListener("click", () => {
-        const h = parseFloat($("heightInput").value);
-        const w = parseFloat($("waistInput").value);
-        const c = parseFloat($("chestInput").value);
-        const a = parseFloat($("armsInput").value);
+        const h = parseFloat(heightInput.value);
+        const w = parseFloat(waistInput.value);
+        const c = parseFloat(chestInput.value);
+        const a = parseFloat(armsInput.value);
 
         if (!isFinite(h) || h <= 0 || !isFinite(w) || w <= 0) {
-            out.innerHTML = `<p class="result-below">Enter at least Height and Waist.</p>`;
+            alert("Enter at least height and waist.");
             return;
         }
 
         let html = "";
 
-        // Waist / Height
         const waistRatio = w / h;
         const waistPerc = waistRatio * 100;
         const waistBand = classifyWaistRatio(waistRatio);
         html += `
-            <p>
-                Waist / Height: <strong>${waistPerc.toFixed(1)}%</strong>
-                <span class="${bandClass(waistBand)}">(${bandLabel(waistBand)})</span>
-            </p>
+            <div>
+                <strong>Waist / Height:</strong>
+                ${waistPerc.toFixed(1)}%
+                — <span>${bandLabel(waistBand)}</span>
+            </div>
         `;
 
-        // Chest / Waist
         if (isFinite(c) && c > 0) {
             const cw = c / w;
-            const band = classifyChestWaist(cw);
+            const chestBand = classifyChestWaist(cw);
             html += `
-                <p>
-                    Chest / Waist: <strong>${format2(cw)}×</strong>
-                    <span class="${bandClass(band)}">(${bandLabel(band)})</span>
-                </p>
+                <div style="margin-top:4px;">
+                    <strong>Chest / Waist:</strong>
+                    ${cw.toFixed(2)}×
+                    — <span>${bandLabel(chestBand)}</span>
+                </div>
             `;
         }
 
-        // Arms / Waist
         if (isFinite(a) && a > 0) {
             const aw = a / w;
-            const band = classifyArmsWaist(aw);
+            const armsBand = classifyArmsWaist(aw);
             html += `
-                <p>
-                    Arms / Waist: <strong>${(aw * 100).toFixed(1)}%</strong>
-                    <span class="${bandClass(band)}">(${bandLabel(band)})</span>
-                </p>
+                <div style="margin-top:4px;">
+                    <strong>Arms / Waist:</strong>
+                    ${(aw * 100).toFixed(1)}%
+                    — <span>${bandLabel(armsBand)}</span>
+                </div>
             `;
         }
 
-        out.innerHTML = html;
+        output.classList.remove("muted");
+        output.innerHTML = html || "Add chest and arms to see more detailed standards.";
     });
 }
 
-// ===============================
-//   STRENGTH STANDARDS
-// ===============================
+// =========================
+// STRENGTH STANDARDS
+// =========================
+
 function classifyIncline(r) {
     if (r >= 1.25) return "godlike";
     if (r >= 1.10) return "great";
     if (r >= 0.90) return "good";
     return "below";
 }
+
 function classifyChins(perc) {
     if (perc >= 0.60) return "godlike";
     if (perc >= 0.45) return "great";
     if (perc >= 0.30) return "good";
     return "below";
 }
+
 function classifyOHP(r) {
     if (r >= 0.90) return "godlike";
     if (r >= 0.80) return "great";
     if (r >= 0.65) return "good";
     return "below";
 }
+
 function classifyCurl(r) {
     if (r >= 0.65) return "godlike";
     if (r >= 0.55) return "great";
@@ -218,89 +214,98 @@ function classifyCurl(r) {
     return "below";
 }
 
-function initStrengthCalculator() {
-    const btn = $("calcStrengthBtn");
-    const out = $("strengthResults");
+function initStrengthStandards() {
+    const bwInput = document.getElementById("bwInput");
+    const inclineInput = document.getElementById("inclineInput");
+    const chinsInput = document.getElementById("chinsInput");
+    const ohpInput = document.getElementById("ohpInput");
+    const curlInput = document.getElementById("curlInput");
+    const btn = document.getElementById("calcStrengthBtn");
+    const output = document.getElementById("strengthResults");
 
     btn.addEventListener("click", () => {
-        const BW = parseFloat($("bwInput").value);
+        const BW = parseFloat(bwInput.value);
         if (!isFinite(BW) || BW <= 0) {
-            out.innerHTML = `<p class="result-below">Enter your Bodyweight.</p>`;
+            alert("Enter your bodyweight.");
             return;
         }
 
         let html = "";
 
-        const inc = parseFloat($("inclineInput").value);
+        // Incline bench
+        const inc = parseFloat(inclineInput.value);
         if (isFinite(inc) && inc > 0) {
             const r = inc / BW;
-            const band = classifyIncline(r);
+            const b = classifyIncline(r);
             html += `
-                <p>
-                    Incline Bench (5 reps): <strong>${format2(r)}× BW</strong>
-                    <span class="${bandClass(band)}">(${bandLabel(band)})</span>
-                </p>
+                <div>
+                    <strong>Incline Bench (5 reps):</strong>
+                    ${r.toFixed(2)}× BW — ${bandLabel(b)}
+                </div>
             `;
         }
 
-        const ch = parseFloat($("chinsInput").value);
-        if (isFinite(ch) && ch > 0) {
-            const perc = ch / BW; // added weight / BW
-            const band = classifyChins(perc);
+        // Weighted chins (added weight only)
+        const chin = parseFloat(chinsInput.value);
+        if (isFinite(chin) && chin > 0) {
+            const perc = chin / BW;
+            const b = classifyChins(perc);
             html += `
-                <p>
-                    Weighted Chins (added, 5 reps): <strong>${(perc * 100).toFixed(1)}% BW</strong>
-                    <span class="${bandClass(band)}">(${bandLabel(band)})</span>
-                </p>
+                <div style="margin-top:4px;">
+                    <strong>Weighted Chins (5 reps):</strong>
+                    ${(perc * 100).toFixed(1)}% BW — ${bandLabel(b)}
+                </div>
             `;
         }
 
-        const ohp = parseFloat($("ohpInput").value);
+        // OHP
+        const ohp = parseFloat(ohpInput.value);
         if (isFinite(ohp) && ohp > 0) {
             const r = ohp / BW;
-            const band = classifyOHP(r);
+            const b = classifyOHP(r);
             html += `
-                <p>
-                    Overhead Press (5 reps): <strong>${format2(r)}× BW</strong>
-                    <span class="${bandClass(band)}">(${bandLabel(band)})</span>
-                </p>
+                <div style="margin-top:4px;">
+                    <strong>Overhead Press (5 reps):</strong>
+                    ${r.toFixed(2)}× BW — ${bandLabel(b)}
+                </div>
             `;
         }
 
-        const curl = parseFloat($("curlInput").value);
+        // Curl
+        const curl = parseFloat(curlInput.value);
         if (isFinite(curl) && curl > 0) {
             const r = curl / BW;
-            const band = classifyCurl(r);
+            const b = classifyCurl(r);
             html += `
-                <p>
-                    Barbell Curl (5 reps): <strong>${format2(r)}× BW</strong>
-                    <span class="${bandClass(band)}">(${bandLabel(band)})</span>
-                </p>
+                <div style="margin-top:4px;">
+                    <strong>Barbell Curl (5 reps):</strong>
+                    ${r.toFixed(2)}× BW — ${bandLabel(b)}
+                </div>
             `;
         }
 
-        if (!html) {
-            html = `<p>Enter at least one lift to see your strength standards.</p>`;
-        }
-
-        out.innerHTML = html;
+        output.classList.remove("muted");
+        output.innerHTML = html || "Add your main lifts to see how they rank.";
     });
 }
 
-// ===============================
-//   WARM-UP CALCULATOR
-// ===============================
-const WARMUP_TEMPLATES = {
+// =========================
+// WARM-UP CALCULATOR
+// =========================
+
+const TEMPLATES = {
     soviet: {
         name: "Soviet Strength",
+        description: "40% × 5, 70% × 2–3, then 100% working set.",
         sets: [
             { type: "Warm-up", percent: 0.40, reps: "5" },
             { type: "Warm-up", percent: 0.70, reps: "2–3" },
-            { type: "Working", percent: 1.00, reps: "6–10 (top set)" }
+            { type: "Working", percent: 1.00, reps: "6–10 (to failure)" }
         ]
     },
     mentzer: {
         name: "Mike Mentzer",
+        description: "50% × 6–8, 75% × 3–4, then 100% × 6–10 to failure.",
         sets: [
             { type: "Warm-up", percent: 0.50, reps: "6–8" },
             { type: "Warm-up", percent: 0.75, reps: "3–4" },
@@ -309,6 +314,7 @@ const WARMUP_TEMPLATES = {
     },
     olympus: {
         name: "Olympus Method",
+        description: "30% × 5, 50% × 3–5, then 100% × 6–10 to failure.",
         sets: [
             { type: "Warm-up", percent: 0.30, reps: "5" },
             { type: "Warm-up", percent: 0.50, reps: "3–5" },
@@ -317,118 +323,346 @@ const WARMUP_TEMPLATES = {
     }
 };
 
-const LIFTS = [
-    "Incline Barbell Bench Press",
-    "Flat Barbell Bench Press",
-    "Bench Press",
-    "Barbell Back Squat",
-    "Deadlift",
-    "Romanian Deadlift",
-    "Weighted Dips (Chest-focused)",
-    "Weighted Pull-Ups",
-    "Bent-Over Barbell Row",
-    "Overhead Press",
-    "Barbell Biceps Curl",
-    "Leg Press",
-    "Hack Squat",
-    "Calf Raises",
-    "Hamstring Curl (Machine)",
-    "Rear Delt Flys",
-    "Barbell Shrugs"
-];
-
 const KG_PLATES = [25, 20, 15, 10, 5, 2.5, 1.25];
 const LB_PLATES = [45, 35, 25, 10, 5, 2.5];
 
-function plateList() {
+function plateConfig() {
     return currentUnit === "kg" ? KG_PLATES : LB_PLATES;
 }
 
-function calcPlates(target, bar) {
-    if (!isFinite(target) || !isFinite(bar)) {
-        return "—";
-    }
-    if (target < bar + 0.01) {
+function formatWeight(val) {
+    if (!isFinite(val)) return "-";
+    const s = val.toFixed(1);
+    return s.endsWith(".0") ? s.slice(0, -2) : s;
+}
+
+function computePlates(targetWeight, barWeight) {
+    const plateSizes = plateConfig();
+    const epsilon = 1e-6;
+
+    if (targetWeight < barWeight - epsilon) {
         return "Bar only";
     }
 
-    let remaining = target - bar;
-    let perSide = remaining / 2;
-    const sizes = plateList();
-    const result = [];
+    let remainingTotal = targetWeight - barWeight;
+    if (remainingTotal < 0) remainingTotal = 0;
+    let perSide = remainingTotal / 2;
+    const platesPerSide = [];
 
-    for (const p of sizes) {
-        const count = Math.floor((perSide + 1e-6) / p);
+    for (const p of plateSizes) {
+        let count = Math.floor((perSide + epsilon) / p);
         if (count > 0) {
-            result.push(`${format1(p)} × ${count}`);
+            platesPerSide.push({ size: p, count });
             perSide -= count * p;
         }
     }
 
-    return result.length ? result.join(", ") + " / side" : "Bar only";
+    if (platesPerSide.length === 0) return "Bar only";
+
+    return platesPerSide
+        .map(pl => `${formatWeight(pl.size)} × ${pl.count}`)
+        .join(", ") + " / side";
 }
 
 function initWarmupCalculator() {
-    const liftSelector = $("liftSelector");
-    const workingWeight = $("workingWeight");
-    const barWeight = $("barWeight");
-    const templateSelector = $("templateSelector");
-    const btn = $("calcWarmupBtn");
-    const out = $("warmupOutput");
+    const liftSelector = document.getElementById("liftSelector");
+    const workingWeightInput = document.getElementById("workingWeight");
+    const barWeightInput = document.getElementById("barWeight");
+    const templateSelector = document.getElementById("templateSelector");
+    const templateHint = document.getElementById("templateHint");
+    const calcBtn = document.getElementById("calcWarmupBtn");
+    const warmupOutput = document.getElementById("warmupOutput");
 
-    // Populate lift dropdown
-    LIFTS.forEach(l => {
+    // Populate lifts
+    const lifts = [
+        "Bench Press",
+        "Incline Barbell Bench Press",
+        "Flat Barbell Bench Press",
+        "Barbell Back Squat",
+        "Deadlift",
+        "Romanian Deadlift",
+        "Overhead Press",
+        "Bent-Over Barbell Row",
+        "Weighted Pull-Ups",
+        "Weighted Dips (Chest-focused)",
+        "Dumbbell Lateral Raises",
+        "Rope Triceps Pushdown",
+        "Skull Crushers",
+        "Hamstring Curl (Machine)",
+        "Calf Raises",
+        "Leg Press (Optional)",
+        "Hack Squat (Optional)",
+        "Barbell Biceps Curl",
+        "Rear Delt Flys",
+        "Barbell Shrugs (Optional)",
+        "Custom / Other"
+    ];
+    lifts.forEach(name => {
         const opt = document.createElement("option");
-        opt.value = l;
-        opt.textContent = l;
+        opt.value = name;
+        opt.textContent = name;
         liftSelector.appendChild(opt);
     });
 
-    btn.addEventListener("click", () => {
-        const work = parseFloat(workingWeight.value);
-        const bar = parseFloat(barWeight.value);
-        const templateKey = templateSelector.value;
+    function updateTemplateHint() {
+        const key = templateSelector.value;
+        const tpl = TEMPLATES[key];
+        if (!tpl) {
+            templateHint.textContent = "";
+            return;
+        }
+        templateHint.textContent = `${tpl.name}: ${tpl.description}`;
+    }
+    templateSelector.addEventListener("change", updateTemplateHint);
+    updateTemplateHint();
 
+    calcBtn.addEventListener("click", () => {
+        const work = parseFloat(workingWeightInput.value);
+        const bar = parseFloat(barWeightInput.value);
         if (!isFinite(work) || work <= 0) {
-            out.innerHTML = `<p class="result-below">Enter a valid Working Weight.</p>`;
+            alert("Enter a valid working set weight.");
             return;
         }
         if (!isFinite(bar) || bar <= 0) {
-            out.innerHTML = `<p class="result-below">Enter a valid Bar Weight.</p>`;
+            alert("Enter a valid bar weight.");
             return;
         }
 
-        const tpl = WARMUP_TEMPLATES[templateKey];
-        if (!tpl) {
-            out.innerHTML = `<p class="result-below">Invalid template.</p>`;
-            return;
-        }
+        const tplKey = templateSelector.value;
+        const tpl = TEMPLATES[tplKey];
+        if (!tpl) return;
 
-        let html = `<p><strong>${tpl.name}</strong> — ${liftSelector.value} (${currentUnit})</p>`;
-        html += `<table class="results-table"><thead><tr>
-            <th>Set</th><th>Type</th><th>%</th><th>Reps</th><th>Target</th><th>Plates</th>
-        </tr></thead><tbody>`;
+        let html = `<table style="width:100%; border-collapse:collapse; font-size:0.9rem;">`;
+        html += `
+            <thead>
+                <tr>
+                    <th align="left">Set</th>
+                    <th align="left">Type</th>
+                    <th align="left">%</th>
+                    <th align="left">Reps</th>
+                    <th align="left">Target</th>
+                    <th align="left">Plates / side</th>
+                </tr>
+            </thead>
+            <tbody>
+        `;
 
-        tpl.sets.forEach((s, idx) => {
-            const tgt = work * s.percent;
-            html += `<tr>
-                <td>${idx + 1}</td>
-                <td>${s.type}</td>
-                <td>${Math.round(s.percent * 100)}%</td>
-                <td>${s.reps}</td>
-                <td>${format1(tgt)} ${currentUnit}</td>
-                <td>${calcPlates(tgt, bar)}</td>
-            </tr>`;
+        tpl.sets.forEach((set, idx) => {
+            const target = work * set.percent;
+            const plates = computePlates(target, bar);
+            html += `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>${set.type}</td>
+                    <td>${Math.round(set.percent * 100)}%</td>
+                    <td>${set.reps}</td>
+                    <td>${formatWeight(target)} ${currentUnit}</td>
+                    <td>${plates}</td>
+                </tr>
+            `;
         });
 
         html += `</tbody></table>`;
-        out.innerHTML = html;
+
+        warmupOutput.classList.remove("muted");
+        warmupOutput.innerHTML = html;
     });
 }
 
-// ===============================
-//   EXERCISE CARDS / DAY LOGS
-// ===============================
+// =========================
+// DAY LOGS & EXERCISES
+// =========================
+
+function loadDayLogs() {
+    try {
+        const raw = localStorage.getItem(DAY_LOG_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveDayLogs(logs) {
+    localStorage.setItem(DAY_LOG_KEY, JSON.stringify(logs));
+}
+
+function getLastDayLog(dayKey) {
+    const logs = loadDayLogs();
+    for (let i = logs.length - 1; i >= 0; i--) {
+        if (logs[i].day === dayKey) return logs[i];
+    }
+    return null;
+}
+
+function gatherDayLog(dayKey) {
+    const containerId = dayKey + "Exercises";
+    const container = document.getElementById(containerId);
+    if (!container) return null;
+
+    const dateInput = document.querySelector(`.workout-date[data-day="${dayKey}"]`);
+    let dateIso;
+    if (dateInput && dateInput.value) {
+        dateIso = new Date(dateInput.value + "T00:00:00").toISOString();
+    } else {
+        dateIso = new Date().toISOString();
+    }
+
+    const cards = container.querySelectorAll(".exercise-card");
+    const log = {
+        day: dayKey,
+        date: dateIso,
+        unit: currentUnit,
+        exercises: []
+    };
+
+    cards.forEach(card => {
+        const nameEl = card.querySelector(".exercise-header");
+        const name = nameEl ? nameEl.textContent.trim() : "Exercise";
+        const notesEl = card.querySelector("textarea");
+        const notes = notesEl ? notesEl.value.trim() : "";
+        const sets = [];
+
+        const rows = card.querySelectorAll(".set-row");
+        rows.forEach((row, idx) => {
+            const type = row.querySelector(".set-type")?.value || "";
+            const w = parseFloat(row.querySelector(".set-weight")?.value || "");
+            const r = parseInt(row.querySelector(".set-reps")?.value || "", 10);
+            if (isFinite(w) && w > 0 && Number.isFinite(r) && r > 0) {
+                sets.push({
+                    setNumber: idx + 1,
+                    type,
+                    weight: w,
+                    reps: r
+                });
+            }
+        });
+
+        if (name || sets.length || notes) {
+            log.exercises.push({ name, notes, sets });
+        }
+    });
+
+    return log;
+}
+
+function saveDayLog(dayKey, silent = true) {
+    const log = gatherDayLog(dayKey);
+    if (!log) return;
+
+    const logs = loadDayLogs();
+    logs.push(log);
+    saveDayLogs(logs);
+
+    if (!silent) {
+        const label = dayKey === "push" ? "Day 1" : dayKey === "legs" ? "Day 2" : "Day 3";
+        alert(label + " log saved.");
+    }
+}
+
+// Debounced autosave per day
+const autoSaveTimers = {};
+function autoSaveDayLog(dayKey) {
+    if (autoSaveTimers[dayKey]) {
+        clearTimeout(autoSaveTimers[dayKey]);
+    }
+    autoSaveTimers[dayKey] = setTimeout(() => {
+        saveDayLog(dayKey, true);
+    }, 800);
+}
+
+// Exercise cards
+function addSetRow(card, dayKey, autofill) {
+    const container = card.querySelector(".set-container");
+    const index = container.children.length + 1;
+
+    const row = document.createElement("div");
+    row.className = "set-row";
+    row.innerHTML = `
+        <div>Set ${index}</div>
+        <select class="set-type">
+            <option value=""></option>
+            <option value="Warm-up">Warm-up</option>
+            <option value="Working">Working</option>
+            <option value="Top Set">Top Set</option>
+            <option value="Backoff">Backoff</option>
+            <option value="Failure">Failure</option>
+            <option value="Drop Set">Drop Set</option>
+            <option value="Optional Set">Optional Set</option>
+        </select>
+        <input type="number" class="set-weight" placeholder="Weight" step="0.5" />
+        <input type="number" class="set-reps" placeholder="Reps" step="1" />
+        <button type="button" class="remove-set">×</button>
+    `;
+
+    const typeEl = row.querySelector(".set-type");
+    const wEl = row.querySelector(".set-weight");
+    const rEl = row.querySelector(".set-reps");
+    const removeBtn = row.querySelector(".remove-set");
+
+    if (autofill) {
+        if (typeof autofill.weight === "number") wEl.value = autofill.weight;
+        if (typeof autofill.reps === "number") rEl.value = autofill.reps;
+    }
+
+    typeEl.addEventListener("change", () => autoSaveDayLog(dayKey));
+    wEl.addEventListener("input", () => autoSaveDayLog(dayKey));
+    rEl.addEventListener("input", () => autoSaveDayLog(dayKey));
+
+    removeBtn.addEventListener("click", () => {
+        row.remove();
+        const rows = container.querySelectorAll(".set-row");
+        rows.forEach((r, i) => {
+            const label = r.querySelector("div");
+            if (label) label.textContent = `Set ${i + 1}`;
+        });
+        autoSaveDayLog(dayKey);
+    });
+
+    container.appendChild(row);
+}
+
+function createExerciseCard(dayKey, name, previousData) {
+    const container = document.getElementById(dayKey + "Exercises");
+    const card = document.createElement("div");
+    card.className = "exercise-card";
+
+    card.innerHTML = `
+        <div class="exercise-header">${name}</div>
+        <div class="set-container"></div>
+        <button type="button" class="btn-ghost add-set-btn">+ Add Set</button>
+        <div style="margin-top:8px;">
+            <label style="font-size:0.8rem; color:var(--text-muted);">Notes</label>
+            <textarea rows="2" style="width:100%; margin-top:4px; padding:6px 8px; border-radius:6px; border:1px solid var(--card-border); background:var(--bg-input); color:var(--text);"></textarea>
+        </div>
+    `;
+
+    const setContainer = card.querySelector(".set-container");
+    const notesArea = card.querySelector("textarea");
+    const addSetBtn = card.querySelector(".add-set-btn");
+
+    if (previousData && previousData.notes) {
+        notesArea.value = previousData.notes;
+    }
+
+    if (previousData && previousData.sets && previousData.sets.length > 0) {
+        previousData.sets.forEach(s => {
+            addSetRow(card, dayKey, { weight: s.weight, reps: s.reps });
+        });
+    } else {
+        addSetRow(card, dayKey);
+        addSetRow(card, dayKey);
+    }
+
+    notesArea.addEventListener("input", () => autoSaveDayLog(dayKey));
+
+    addSetBtn.addEventListener("click", () => {
+        addSetRow(card, dayKey);
+        autoSaveDayLog(dayKey);
+    });
+
+    container.appendChild(card);
+}
+
 const DEFAULT_SPLIT = {
     push: [
         "Incline Barbell Bench Press",
@@ -455,366 +689,237 @@ const DEFAULT_SPLIT = {
     ]
 };
 
-function createSetRow(setData, onChange) {
-    const row = document.createElement("div");
-    row.className = "set-row";
+function initDay(dayKey) {
+    const lastLog = getLastDayLog(dayKey);
+    const containerId = dayKey + "Exercises";
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
 
-    const idxSpan = document.createElement("div");
-    idxSpan.textContent = setData.indexLabel || "1";
+    let exercisesToCreate = [];
 
-    const typeSel = document.createElement("select");
-    ["", "Warm-up", "Working", "Top Set", "Backoff", "Failure", "Drop Set", "Optional Set"].forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t;
-        opt.textContent = t;
-        typeSel.appendChild(opt);
-    });
-    if (setData.type) typeSel.value = setData.type;
-
-    const weightInput = document.createElement("input");
-    weightInput.type = "number";
-    weightInput.placeholder = "Weight";
-    if (typeof setData.weight === "number") weightInput.value = setData.weight;
-
-    const repsInput = document.createElement("input");
-    repsInput.type = "number";
-    repsInput.placeholder = "Reps";
-    if (typeof setData.reps === "number") repsInput.value = setData.reps;
-
-    const removeBtn = document.createElement("button");
-    removeBtn.className = "remove-set";
-    removeBtn.textContent = "×";
-
-    row.appendChild(idxSpan);
-    row.appendChild(typeSel);
-    row.appendChild(weightInput);
-    row.appendChild(repsInput);
-    row.appendChild(removeBtn);
-
-    [typeSel, weightInput, repsInput].forEach(el => {
-        el.addEventListener("input", () => onChange());
-    });
-
-    removeBtn.addEventListener("click", () => {
-        row.remove();
-        onChange();
-    });
-
-    row._indexSpan = idxSpan;
-    row._typeInput = typeSel;
-    row._weightInput = weightInput;
-    row._repsInput = repsInput;
-
-    return row;
-}
-
-function renumberSetRows(container) {
-    const rows = container.querySelectorAll(".set-row");
-    rows.forEach((row, i) => {
-        if (row._indexSpan) row._indexSpan.textContent = (i + 1).toString();
-    });
-}
-
-function buildExerciseCard(dayKey, container, name) {
-    const card = document.createElement("div");
-    card.className = "exercise-card";
-
-    const header = document.createElement("div");
-    header.className = "exercise-header";
-
-    const title = document.createElement("div");
-    title.className = "exercise-name";
-    title.textContent = name;
-
-    const lastPerf = document.createElement("div");
-    lastPerf.className = "last-performance";
-
-    header.appendChild(title);
-    header.appendChild(lastPerf);
-
-    const setsBox = document.createElement("div");
-
-    const addSetBtn = document.createElement("button");
-    addSetBtn.className = "add-set-btn";
-    addSetBtn.textContent = "+ Add Set";
-
-    const notes = document.createElement("textarea");
-    notes.className = "notes-box";
-    notes.placeholder = "Notes, RPE, tempo, etc.";
-
-    card.appendChild(header);
-    card.appendChild(setsBox);
-    card.appendChild(addSetBtn);
-    card.appendChild(notes);
-
-    container.appendChild(card);
-
-    const lastLog = getLastExerciseLog(dayKey, name);
-    let baseWeight = null;
-    let baseReps = null;
-
-    if (lastLog && lastLog.sets && lastLog.sets.length > 0) {
-        lastPerf.textContent = (() => {
-            const top = lastLog.sets[lastLog.sets.length - 1];
-            baseWeight = top.weight;
-            baseReps = top.reps;
-            return `Last: ${format1(top.weight)} x ${top.reps}`;
-        })();
-
-        lastLog.sets.forEach((s, idx) => {
-            const isOptional = name.toLowerCase().includes("(optional");
-            const row = createSetRow({
-                indexLabel: (idx + 1).toString(),
-                type: s.type || "",
-                weight: s.weight,
-                reps: isOptional ? null : s.reps
-            }, () => scheduleAutoSave(dayKey));
-            setsBox.appendChild(row);
+    if (lastLog && Array.isArray(lastLog.exercises) && lastLog.exercises.length > 0) {
+        exercisesToCreate = lastLog.exercises.map(e => e.name);
+        lastLog.exercises.forEach(ex => {
+            createExerciseCard(dayKey, ex.name, ex);
         });
-
-        notes.value = lastLog.notes || "";
     } else {
-        // Default 2 empty sets
-        for (let i = 0; i < 2; i++) {
-            const row = createSetRow({
-                indexLabel: (i + 1).toString()
-            }, () => scheduleAutoSave(dayKey));
-            setsBox.appendChild(row);
-        }
-    }
-
-    addSetBtn.addEventListener("click", () => {
-        const isOptional = name.toLowerCase().includes("(optional");
-        const row = createSetRow({
-            indexLabel: (setsBox.children.length + 1).toString(),
-            weight: baseWeight,
-            reps: isOptional ? null : baseReps
-        }, () => scheduleAutoSave(dayKey));
-        setsBox.appendChild(row);
-        renumberSetRows(setsBox);
-        scheduleAutoSave(dayKey);
-    });
-
-    notes.addEventListener("input", () => scheduleAutoSave(dayKey));
-
-    card._getData = () => {
-        const sets = [];
-        const rows = setsBox.querySelectorAll(".set-row");
-        rows.forEach((row, i) => {
-            const t = row._typeInput.value || "";
-            const w = parseFloat(row._weightInput.value);
-            const r = parseInt(row._repsInput.value, 10);
-            if (isFinite(w) && w > 0 && Number.isFinite(r) && r > 0) {
-                sets.push({
-                    setNumber: i + 1,
-                    type: t,
-                    weight: w,
-                    reps: r
-                });
-            }
-        });
-        return {
-            name,
-            notes: notes.value.trim(),
-            sets
-        };
-    };
-
-    card._updateLastPerf = () => {
-        const data = card._getData();
-        if (data.sets.length > 0) {
-            const top = data.sets[data.sets.length - 1];
-            lastPerf.textContent = `Last: ${format1(top.weight)} x ${top.reps}`;
-        }
-    };
-
-    return card;
-}
-
-const dayContainers = {
-    push: "pushContainer",
-    legs: "legsContainer",
-    pull: "pullContainer"
-};
-
-const autoSaveTimers = {};
-
-function scheduleAutoSave(dayKey) {
-    if (autoSaveTimers[dayKey]) {
-        clearTimeout(autoSaveTimers[dayKey]);
-    }
-    autoSaveTimers[dayKey] = setTimeout(() => {
-        saveDay(dayKey, true);
-    }, 800);
-}
-
-function gatherDayData(dayKey) {
-    const containerId = dayContainers[dayKey];
-    if (!containerId) return null;
-    const container = $(containerId);
-    if (!container) return null;
-
-    const dateInput = document.querySelector(`.workout-date[data-day="${dayKey}"]`);
-    let dateIso = new Date().toISOString();
-    if (dateInput && dateInput.value) {
-        dateIso = new Date(dateInput.value + "T00:00:00").toISOString();
-    }
-
-    const cards = container.querySelectorAll(".exercise-card");
-    const exercises = [];
-    cards.forEach(card => {
-        if (typeof card._getData === "function") {
-            const ex = card._getData();
-            if (ex.name || ex.sets.length || ex.notes) {
-                exercises.push(ex);
-            }
-        }
-    });
-
-    return {
-        day: dayKey,
-        date: dateIso,
-        unit: currentUnit,
-        exercises
-    };
-}
-
-// global for HTML inline onclick
-function saveDay(dayKey, silent) {
-    const data = gatherDayData(dayKey);
-    if (!data) return;
-
-    const logs = loadLogs();
-    logs.push(data);
-    saveLogs(logs);
-
-    // update last performance labels
-    const containerId = dayContainers[dayKey];
-    const container = $(containerId);
-    if (container) {
-        container.querySelectorAll(".exercise-card").forEach(card => {
-            if (typeof card._updateLastPerf === "function") {
-                card._updateLastPerf();
-            }
-        });
-    }
-
-    if (!silent) {
-        alert(`Saved ${dayKey.toUpperCase()} workout.`);
-    }
-}
-window.saveDay = saveDay;
-
-// Initialize default exercises and dates
-function initDayLogs() {
-    ["push", "legs", "pull"].forEach(dayKey => {
-        const containerId = dayContainers[dayKey];
-        const container = $(containerId);
-        if (!container) return;
-
         DEFAULT_SPLIT[dayKey].forEach(name => {
-            buildExerciseCard(dayKey, container, name);
+            createExerciseCard(dayKey, name, null);
         });
+    }
 
-        const dateInput = document.querySelector(`.workout-date[data-day="${dayKey}"]`);
-        if (dateInput) {
-            const last = getLastDayDate(dayKey);
-            if (last) dateInput.value = last;
-            else dateInput.value = new Date().toISOString().slice(0, 10);
+    // Date
+    const dateInput = document.querySelector(`.workout-date[data-day="${dayKey}"]`);
+    if (dateInput) {
+        if (lastLog && lastLog.date) {
+            dateInput.value = lastLog.date.slice(0, 10);
+        } else {
+            dateInput.value = new Date().toISOString().slice(0, 10);
+        }
+        dateInput.addEventListener("change", () => autoSaveDayLog(dayKey));
+    }
 
-            dateInput.addEventListener("change", () => scheduleAutoSave(dayKey));
+    // Add exercise
+    const addInput = document.getElementById(dayKey + "AddInput");
+    const addBtn = document.getElementById(dayKey + "AddBtn");
+    function addExercise() {
+        const val = addInput.value.trim();
+        if (!val) return;
+        createExerciseCard(dayKey, val, null);
+        addInput.value = "";
+        autoSaveDayLog(dayKey);
+    }
+    addBtn.addEventListener("click", addExercise);
+    addInput.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            addExercise();
         }
     });
-}
 
-// ===============================
-//   TIMERS
-// ===============================
-let workoutTimer = null;
-let workoutSeconds = 0;
-
-function updateWorkoutDisplay() {
-    const el = $("workoutTime");
-    const h = Math.floor(workoutSeconds / 3600);
-    const m = Math.floor((workoutSeconds % 3600) / 60);
-    const s = workoutSeconds % 60;
-    el.textContent = [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
-}
-
-function startWorkoutTimer() {
-    if (workoutTimer) return;
-    workoutTimer = setInterval(() => {
-        workoutSeconds++;
-        updateWorkoutDisplay();
-    }, 1000);
-}
-function pauseWorkoutTimer() {
-    clearInterval(workoutTimer);
-    workoutTimer = null;
-}
-function resetWorkoutTimer() {
-    pauseWorkoutTimer();
-    workoutSeconds = 0;
-    updateWorkoutDisplay();
-}
-
-let restTimer = null;
-let restRemaining = 0;
-
-function updateRestDisplay() {
-    const el = $("restTime");
-    const m = Math.floor(restRemaining / 60);
-    const s = restRemaining % 60;
-    el.textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-
-function startRest(seconds) {
-    if (typeof seconds === "number") {
-        restRemaining = seconds;
+    // Save button
+    const saveBtn = document.querySelector(`.save-day-btn[data-day="${dayKey}"]`);
+    if (saveBtn) {
+        saveBtn.addEventListener("click", () => saveDayLog(dayKey, false));
     }
-    updateRestDisplay();
-    if (restTimer) clearInterval(restTimer);
-    restTimer = setInterval(() => {
-        restRemaining--;
-        if (restRemaining <= 0) {
-            restRemaining = 0;
-            updateRestDisplay();
-            clearInterval(restTimer);
-            restTimer = null;
-            alert("Rest over — time to lift.");
-        } else {
-            updateRestDisplay();
-        }
-    }, 1000);
 }
 
-function addRest(extra) {
-    restRemaining += extra;
-    if (restRemaining < 0) restRemaining = 0;
-    updateRestDisplay();
+function initDays() {
+    ["push", "legs", "pull"].forEach(initDay);
 }
 
-// Expose for HTML inline handlers
-window.startRest = startRest;
-window.addRest = addRest;
+// =========================
+// TIMERS
+// =========================
 
 function initTimers() {
-    $("startWorkout").addEventListener("click", startWorkoutTimer);
-    $("pauseWorkout").addEventListener("click", pauseWorkoutTimer);
-    $("resetWorkout").addEventListener("click", resetWorkoutTimer);
+    const workoutDisplay = document.getElementById("workoutDisplay");
+    const workoutSummary = document.getElementById("workoutSummary");
+    const restDisplay = document.getElementById("restDisplay");
+    const restSummary = document.getElementById("restSummary");
+
+    const workoutStartPauseBtn = document.getElementById("workoutStartPause");
+    const workoutResetBtn = document.getElementById("workoutReset");
+
+    const restStartPauseBtn = document.getElementById("restStartPause");
+    const restResetBtn = document.getElementById("restReset");
+    const restPresetBtns = document.querySelectorAll(".rest-preset");
+    const restPlus30Btn = document.getElementById("restPlus30");
+
+    const timerToggleBtn = document.getElementById("timerToggleBtn");
+    const timerDetails = document.getElementById("timerDetails");
+
+    let workoutSeconds = 0;
+    let workoutInterval = null;
+    let workoutRunning = false;
+
+    function formatWorkout(sec) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    function updateWorkoutDisplay() {
+        const text = formatWorkout(workoutSeconds);
+        workoutDisplay.textContent = text;
+        workoutSummary.textContent = text;
+    }
+
+    workoutStartPauseBtn.addEventListener("click", () => {
+        if (!workoutRunning) {
+            workoutRunning = true;
+            workoutStartPauseBtn.textContent = "Pause";
+            workoutInterval = setInterval(() => {
+                workoutSeconds++;
+                updateWorkoutDisplay();
+            }, 1000);
+        } else {
+            workoutRunning = false;
+            workoutStartPauseBtn.textContent = "Start";
+            clearInterval(workoutInterval);
+        }
+    });
+
+    workoutResetBtn.addEventListener("click", () => {
+        workoutRunning = false;
+        clearInterval(workoutInterval);
+        workoutSeconds = 0;
+        updateWorkoutDisplay();
+        workoutStartPauseBtn.textContent = "Start";
+    });
+
     updateWorkoutDisplay();
+
+    let restDuration = 60;
+    let restRemaining = 60;
+    let restInterval = null;
+    let restRunning = false;
+
+    function updateRestDisplay() {
+        restDisplay.textContent = `${restRemaining}s`;
+        restSummary.textContent = `${restRemaining}s`;
+    }
+
+    restPresetBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const sec = parseInt(btn.dataset.sec, 10);
+            if (!Number.isFinite(sec)) return;
+            restDuration = sec;
+            restRemaining = sec;
+            updateRestDisplay();
+        });
+    });
+
+    restPlus30Btn.addEventListener("click", () => {
+        restRemaining += 30;
+        restDuration = restRemaining;
+        updateRestDisplay();
+    });
+
+    function beep() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.value = 880;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+            osc.stop(ctx.currentTime + 0.3);
+        } catch {}
+    }
+
+    function vibrate() {
+        if (navigator.vibrate) {
+            navigator.vibrate([200, 100, 200]);
+        }
+    }
+
+    restStartPauseBtn.addEventListener("click", () => {
+        if (!restRunning) {
+            if (restRemaining <= 0) restRemaining = restDuration;
+            restRunning = true;
+            restStartPauseBtn.textContent = "Pause";
+            restInterval = setInterval(() => {
+                restRemaining--;
+                if (restRemaining <= 0) {
+                    restRemaining = 0;
+                    clearInterval(restInterval);
+                    restRunning = false;
+                    restStartPauseBtn.textContent = "Start";
+                    updateRestDisplay();
+                    beep();
+                    vibrate();
+                    alert("Rest over — time to hit the next set.");
+                    return;
+                }
+                updateRestDisplay();
+            }, 1000);
+        } else {
+            restRunning = false;
+            restStartPauseBtn.textContent = "Start";
+            clearInterval(restInterval);
+        }
+    });
+
+    restResetBtn.addEventListener("click", () => {
+        restRunning = false;
+        clearInterval(restInterval);
+        restRemaining = restDuration;
+        updateRestDisplay();
+        restStartPauseBtn.textContent = "Start";
+    });
+
     updateRestDisplay();
+
+    // Toggle details
+    let detailsVisible = false;
+    timerToggleBtn.addEventListener("click", () => {
+        detailsVisible = !detailsVisible;
+        if (detailsVisible) {
+            timerDetails.classList.add("active");
+            timerToggleBtn.textContent = "▼";
+        } else {
+            timerDetails.classList.remove("active");
+            timerToggleBtn.textContent = "▲";
+        }
+    });
 }
 
-// ===============================
-//   INIT
-// ===============================
+// =========================
+// INIT EVERYTHING
+// =========================
+
 document.addEventListener("DOMContentLoaded", () => {
+    initTheme();
+    initUnit();
     initTabs();
-    initUnitSelector();
-    initBodyCalculator();
-    initStrengthCalculator();
+    initBodyStandards();
+    initStrengthStandards();
     initWarmupCalculator();
-    initDayLogs();
+    initDays();
     initTimers();
 });
