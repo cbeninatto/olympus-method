@@ -1,0 +1,303 @@
+/* ============================================
+   GLOBAL RESET
+============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    background: #0d0d0d;
+    color: #f5f5f5;
+    padding-bottom: 140px; /* space for timer footer */
+}
+
+/* ============================================
+   HEADER
+============================================ */
+.header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #333;
+    background: #111;
+}
+
+.header h1 {
+    font-size: 26px;
+    margin-bottom: 10px;
+    color: #ffd84d;
+}
+
+.unit-toggle {
+    margin-top: 5px;
+}
+
+.unit-toggle select {
+    background: #222;
+    color: white;
+    border: 1px solid #444;
+    padding: 6px;
+    border-radius: 5px;
+}
+
+/* ============================================
+   TABS
+============================================ */
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    background: #111;
+    border-bottom: 2px solid #222;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 14px 0;
+    background: #111;
+    color: #bbb;
+    border: none;
+    font-size: 16px;
+}
+
+.tab-btn.active {
+    background: #222;
+    color: #ffd84d;
+    border-bottom: 3px solid #ffd84d;
+}
+
+.tab-btn:hover {
+    background: #191919;
+}
+
+/* ============================================
+   TAB CONTENT
+============================================ */
+.tab-content {
+    display: none;
+    padding: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.section-title {
+    font-size: 22px;
+    margin: 25px 0 10px;
+    color: #ffd84d;
+}
+
+.subsection-title {
+    font-size: 16px;
+    margin: 10px 0;
+    color: #00eaff;
+}
+
+/* ============================================
+   INPUT GRID
+============================================ */
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.input-grid input,
+.input-grid select {
+    width: 100%;
+    padding: 10px;
+    background: #1c1c1c;
+    border: 1px solid #333;
+    color: white;
+    border-radius: 6px;
+}
+
+/* ============================================
+   BUTTONS
+============================================ */
+.btn-primary {
+    display: block;
+    width: 100%;
+    margin: 10px 0 20px;
+    padding: 12px;
+    font-size: 16px;
+    background: #ffd84d;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-secondary {
+    padding: 10px 14px;
+    margin: 5px;
+    background: #333;
+    color: #eee;
+    border-radius: 6px;
+    border: 1px solid #555;
+    cursor: pointer;
+}
+
+/* Save Button */
+.btn-save {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    background: #2aff80;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* ============================================
+   RESULTS BOX
+============================================ */
+.results-container {
+    background: #121212;
+    padding: 15px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 15px;
+}
+
+.result-good {
+    color: #00eaff;
+    font-weight: bold;
+}
+
+.result-great {
+    color: #2aff80;
+    font-weight: bold;
+}
+
+.result-godlike {
+    color: #ffd84d;
+    font-weight: bold;
+}
+
+.result-below {
+    color: #ff4d4d;
+    font-weight: bold;
+}
+
+/* ============================================
+   EXERCISE CARDS
+============================================ */
+.exercise-card {
+    background: #151515;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.exercise-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.exercise-name {
+    font-size: 18px;
+    color: #ffd84d;
+}
+
+.last-performance {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+/* Set Row */
+.set-row {
+    display: grid;
+    grid-template-columns: 50px 120px 80px 80px 40px;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.set-row input,
+.set-row select {
+    background: #1c1c1c;
+    border: 1px solid #333;
+    padding: 6px;
+    color: white;
+    border-radius: 6px;
+}
+
+.remove-set {
+    color: #ff4d4d;
+    background: none;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Add Set Button */
+.add-set-btn {
+    width: 120px;
+    margin: 10px 0;
+    padding: 8px;
+    background: #333;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Notes */
+.notes-box {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    background: #1c1c1c;
+    border: 1px solid #333;
+    color: white;
+    border-radius: 6px;
+}
+
+/* ============================================
+   TIMER FOOTER
+============================================ */
+#timerFooter {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #111;
+    border-top: 2px solid #222;
+    padding: 10px;
+}
+
+.timer-grid {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+#workoutTime,
+#restTime {
+    font-size: 22px;
+    margin: 10px 0;
+}
+
+/* ============================================
+   MOBILE OPTIMIZATION
+============================================ */
+@media (max-width: 700px) {
+    .set-row {
+        grid-template-columns: 40px 90px 70px 70px 30px;
+    }
+
+    .timer-grid {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
