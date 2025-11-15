@@ -1,303 +1,450 @@
-/* ============================================
-   GLOBAL RESET
-============================================ */
+/* --------------------------------------------
+   BASE + RESET
+--------------------------------------------- */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
-    background: #0d0d0d;
-    color: #f5f5f5;
-    padding-bottom: 140px; /* space for timer footer */
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.25s ease, color 0.25s ease;
 }
 
-/* ============================================
-   HEADER
-============================================ */
-.header {
-    padding: 20px;
-    text-align: center;
-    border-bottom: 1px solid #333;
-    background: #111;
+body.light {
+    --bg: #ffffff;
+    --bg-card: #f7f7f7;
+    --bg-input: #ffffff;
+    --bg-input-dark: #f2f2f2;
+
+    --card-border: #e5e7eb;
+    --divider: #e5e7eb;
+
+    --text: #111111;
+    --text-muted: #6b7280;
+
+    --btn-primary-bg: #111111;
+    --btn-primary-text: #ffffff;
+
+    --btn-secondary-bg: transparent;
+    --btn-secondary-text: #111111;
+    --btn-secondary-border: #111111;
+
+    --toggle-bg: #e5e7eb;
 }
 
-.header h1 {
-    font-size: 26px;
-    margin-bottom: 10px;
-    color: #ffd84d;
+body.dark {
+    --bg: #111827;
+    --bg-card: #1f2937;
+    --bg-input: #2d3748;
+    --bg-input-dark: #374151;
+
+    --card-border: #374151;
+    --divider: #4b5563;
+
+    --text: #f9fafb;
+    --text-muted: #9ca3af;
+
+    --btn-primary-bg: #374151;
+    --btn-primary-text: #ffffff;
+
+    --btn-secondary-bg: transparent;
+    --btn-secondary-text: #f9fafb;
+    --btn-secondary-border: #f9fafb;
+
+    --toggle-bg: #374151;
 }
 
-.unit-toggle {
-    margin-top: 5px;
+/* AUTO MODE (system preference) */
+@media (prefers-color-scheme: dark) {
+    body.auto {
+        --bg: #111827;
+        --bg-card: #1f2937;
+        --bg-input: #2d3748;
+        --bg-input-dark: #374151;
+
+        --card-border: #374151;
+        --divider: #4b5563;
+
+        --text: #f9fafb;
+        --text-muted: #9ca3af;
+
+        --btn-primary-bg: #374151;
+        --btn-primary-text: #ffffff;
+
+        --btn-secondary-bg: transparent;
+        --btn-secondary-text: #f9fafb;
+        --btn-secondary-border: #f9fafb;
+
+        --toggle-bg: #374151;
+    }
+}
+@media (prefers-color-scheme: light) {
+    body.auto {
+        --bg: #ffffff;
+        --bg-card: #f7f7f7;
+        --bg-input: #ffffff;
+        --bg-input-dark: #f2f2f2;
+
+        --card-border: #e5e7eb;
+        --divider: #e5e7eb;
+
+        --text: #111111;
+        --text-muted: #6b7280;
+
+        --btn-primary-bg: #111111;
+        --btn-primary-text: #ffffff;
+
+        --btn-secondary-bg: transparent;
+        --btn-secondary-text: #111111;
+        --btn-secondary-border: #111111;
+
+        --toggle-bg: #e5e7eb;
+    }
 }
 
-.unit-toggle select {
-    background: #222;
-    color: white;
-    border: 1px solid #444;
-    padding: 6px;
-    border-radius: 5px;
+/* --------------------------------------------
+   LAYOUT
+--------------------------------------------- */
+.app {
+    max-width: 760px;
+    margin: 0 auto;
+    padding-bottom: 120px; /* footer space */
 }
 
-/* ============================================
+.app-header {
+    padding: 24px 20px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.header-left h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.header-left p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.header-right {
+    display: flex;
+    gap: 14px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.control-label {
+    font-size: 0.7rem;
+    margin-bottom: 4px;
+    color: var(--text-muted);
+}
+
+.control-select {
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--card-border);
+    background: var(--bg-input);
+    color: var(--text);
+}
+
+/* --------------------------------------------
    TABS
-============================================ */
+--------------------------------------------- */
 .tabs {
     display: flex;
-    justify-content: space-around;
-    background: #111;
-    border-bottom: 2px solid #222;
+    border-bottom: 1px solid var(--divider);
 }
 
-.tab-btn {
+.tab-button {
     flex: 1;
-    padding: 14px 0;
-    background: #111;
-    color: #bbb;
+    padding: 12px 0;
+    text-align: center;
+    background: none;
     border: none;
-    font-size: 16px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.25s, background 0.25s;
 }
 
-.tab-btn.active {
-    background: #222;
-    color: #ffd84d;
-    border-bottom: 3px solid #ffd84d;
+.tab-button.active {
+    color: var(--text);
+    font-weight: 600;
+    background: var(--bg-card);
 }
 
-.tab-btn:hover {
-    background: #191919;
-}
-
-/* ============================================
-   TAB CONTENT
-============================================ */
-.tab-content {
+/* --------------------------------------------
+   PANELS & CARDS
+--------------------------------------------- */
+.tab-panel {
     display: none;
     padding: 20px;
 }
 
-.tab-content.active {
+.tab-panel.active {
     display: block;
 }
 
-.section-title {
-    font-size: 22px;
-    margin: 25px 0 10px;
-    color: #ffd84d;
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--card-border);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
 }
 
-.subsection-title {
-    font-size: 16px;
-    margin: 10px 0;
-    color: #00eaff;
+.card-header h2 {
+    font-size: 1.25rem;
+    margin-bottom: 4px;
 }
 
-/* ============================================
-   INPUT GRID
-============================================ */
+.card-caption {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* --------------------------------------------
+   INPUTS
+--------------------------------------------- */
+.field {
+    display: flex;
+    flex-direction: column;
+}
+
+.field label {
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+
+.field-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+}
+
+input[type="number"],
+input[type="text"],
+input[type="date"],
+select {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--card-border);
+    background: var(--bg-input);
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+input::placeholder {
+    color: var(--text-muted);
+}
+
 .input-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
 }
 
-.input-grid input,
-.input-grid select {
-    width: 100%;
-    padding: 10px;
-    background: #1c1c1c;
-    border: 1px solid #333;
-    color: white;
-    border-radius: 6px;
-}
-
-/* ============================================
+/* --------------------------------------------
    BUTTONS
-============================================ */
-.btn-primary {
-    display: block;
-    width: 100%;
-    margin: 10px 0 20px;
-    padding: 12px;
-    font-size: 16px;
-    background: #ffd84d;
-    color: #000;
-    border: none;
+--------------------------------------------- */
+.btn-primary,
+.btn-secondary,
+.btn-ghost {
+    padding: 10px 14px;
     border-radius: 6px;
+    font-size: 0.9rem;
     cursor: pointer;
-    font-weight: 600;
+    transition: background 0.25s, color 0.25s, border 0.25s;
+}
+
+.btn-primary {
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+}
+
+.btn-primary:hover {
+    opacity: 0.85;
 }
 
 .btn-secondary {
-    padding: 10px 14px;
-    margin: 5px;
-    background: #333;
-    color: #eee;
-    border-radius: 6px;
-    border: 1px solid #555;
-    cursor: pointer;
+    background: var(--btn-secondary-bg);
+    color: var(--btn-secondary-text);
+    border: 1px solid var(--btn-secondary-border);
 }
 
-/* Save Button */
-.btn-save {
-    width: 100%;
-    margin-top: 20px;
-    padding: 14px;
-    background: #2aff80;
-    color: #000;
+.btn-secondary:hover {
+    opacity: 0.75;
+}
+
+.btn-ghost {
+    background: none;
+    color: var(--text);
     border: none;
+    padding: 8px 10px;
+    font-weight: 500;
+}
+
+/* --------------------------------------------
+   RESULTS BLOCK
+--------------------------------------------- */
+.results-block {
+    margin-top: 12px;
+    padding: 14px;
     border-radius: 8px;
-    font-size: 18px;
-    font-weight: bold;
+    border: 1px solid var(--card-border);
+    background: var(--bg-input-dark);
+    font-size: 0.9rem;
 }
 
-/* ============================================
-   RESULTS BOX
-============================================ */
-.results-container {
-    background: #121212;
-    padding: 15px;
-    border: 1px solid #333;
-    border-radius: 8px;
-    margin-top: 10px;
-    font-size: 15px;
+.muted {
+    color: var(--text-muted);
 }
 
-.result-good {
-    color: #00eaff;
-    font-weight: bold;
-}
-
-.result-great {
-    color: #2aff80;
-    font-weight: bold;
-}
-
-.result-godlike {
-    color: #ffd84d;
-    font-weight: bold;
-}
-
-.result-below {
-    color: #ff4d4d;
-    font-weight: bold;
-}
-
-/* ============================================
-   EXERCISE CARDS
-============================================ */
+/* --------------------------------------------
+   EXERCISE LIST & CARDS
+--------------------------------------------- */
 .exercise-card {
-    background: #151515;
-    border: 1px solid #333;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--card-border);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 18px;
 }
 
 .exercise-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 12px;
 }
 
-.exercise-name {
-    font-size: 18px;
-    color: #ffd84d;
-}
-
-.last-performance {
-    font-size: 13px;
-    color: #888;
-    margin-bottom: 10px;
-}
-
-/* Set Row */
 .set-row {
     display: grid;
-    grid-template-columns: 50px 120px 80px 80px 40px;
-    gap: 8px;
+    grid-template-columns: 50px 110px 1fr 1fr 40px;
+    gap: 10px;
+    margin-bottom: 10px;
     align-items: center;
-    margin-bottom: 8px;
 }
 
-.set-row input,
 .set-row select {
-    background: #1c1c1c;
-    border: 1px solid #333;
-    padding: 6px;
-    color: white;
-    border-radius: 6px;
-}
-
-.remove-set {
-    color: #ff4d4d;
-    background: none;
-    font-size: 20px;
-    border: none;
-    cursor: pointer;
-}
-
-/* Add Set Button */
-.add-set-btn {
-    width: 120px;
-    margin: 10px 0;
-    padding: 8px;
-    background: #333;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* Notes */
-.notes-box {
     width: 100%;
-    margin-top: 10px;
-    padding: 10px;
-    background: #1c1c1c;
-    border: 1px solid #333;
-    color: white;
-    border-radius: 6px;
 }
 
-/* ============================================
-   TIMER FOOTER
-============================================ */
-#timerFooter {
+.set-row button.remove-set {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+/* --------------------------------------------
+   ADD EXERCISE
+--------------------------------------------- */
+.add-exercise-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.add-exercise-input {
+    flex: 1;
+}
+
+/* --------------------------------------------
+   TIMERS FOOTER
+--------------------------------------------- */
+.timer-footer {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    background: #111;
-    border-top: 2px solid #222;
-    padding: 10px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--card-border);
+    padding: 8px 0;
+    z-index: 50;
 }
 
-.timer-grid {
+.timer-top {
     display: flex;
     justify-content: space-between;
-    padding: 10px;
+    align-items: center;
+    padding: 0 14px;
 }
 
-#workoutTime,
-#restTime {
-    font-size: 22px;
-    margin: 10px 0;
+.timer-summary {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
 }
 
-/* ============================================
-   MOBILE OPTIMIZATION
-============================================ */
-@media (max-width: 700px) {
-    .set-row {
-        grid-template-columns: 40px 90px 70px 70px 30px;
-    }
+.summary-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
 
-    .timer-grid {
-        flex-direction: column;
-        gap: 20px;
-    }
+.summary-value {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.timer-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.timer-details {
+    padding: 14px;
+    display: none;
+}
+
+.timer-details.active {
+    display: block;
+}
+
+.timer-column {
+    margin-bottom: 12px;
+}
+
+.timer-label {
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+
+.timer-display {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.timer-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+/* --------------------------------------------
+   UTILITIES
+--------------------------------------------- */
+.card-footer {
+    margin-top: 16px;
+    text-align: right;
 }
