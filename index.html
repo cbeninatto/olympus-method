@@ -1,144 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Olympus Method — Gym Log</title>
+    <meta charset="UTF-8" />
+    <title>Olympus Method — Heavy Duty Log</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<!-- Inter font -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<!-- External CSS -->
-<link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="app.js"></script>
 </head>
-<body>
-
+<body class="auto">
 <div class="app">
-    <header>
+    <header class="app-header">
         <div class="header-left">
-            <h1>
+            <h1 class="app-title">
                 Olympus Method
                 <span class="logo-pill">Heavy Duty</span>
             </h1>
-            <div class="tagline">
-                Warm-ups, standards, timers, and a 3-day Push / Legs / Pull log — built for real gym use.
-            </div>
+            <p class="tagline">
+                Minimalist 3-day Push / Legs / Pull log with warm-ups, standards, timers and tracking.
+            </p>
         </div>
         <div class="header-right">
-            <div class="unit-label">Unit</div>
-            <div class="unit-toggle">
-                <button type="button" id="kgBtn">kg</button>
-                <button type="button" id="lbBtn">lb</button>
+            <div class="theme-group">
+                <span class="theme-label">Theme</span>
+                <select id="themeSelect" class="theme-select">
+                    <option value="auto">Auto</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <span class="control-label">Unit</span>
+                <div class="unit-toggle">
+                    <button type="button" id="kgBtn">kg</button>
+                    <button type="button" id="lbBtn">lb</button>
+                </div>
             </div>
         </div>
     </header>
 
+    <!-- Tabs -->
     <div class="tabs">
-        <button class="tab-button active" data-target="tab-calculator">
-            <span class="dot"></span> Calculator
-        </button>
-        <button class="tab-button" data-target="tab-push">
-            <span class="dot"></span> Day 1 — Push
-        </button>
-        <button class="tab-button" data-target="tab-legs">
-            <span class="dot"></span> Day 2 — Legs
-        </button>
-        <button class="tab-button" data-target="tab-pull">
-            <span class="dot"></span> Day 3 — Pull
-        </button>
+        <button class="tab-button active" data-target="tab-calculator">Calculator</button>
+        <button class="tab-button" data-target="tab-push">Day 1 — Push</button>
+        <button class="tab-button" data-target="tab-legs">Day 2 — Legs</button>
+        <button class="tab-button" data-target="tab-pull">Day 3 — Pull</button>
     </div>
 
-    <!-- TAB 1: CALCULATOR -->
+    <!-- TAB: CALCULATOR -->
     <section id="tab-calculator" class="tab-panel active">
-        <!-- Body standards -->
+        <!-- Body Standards -->
         <div class="card">
-            <h2>
-                Physique Standards
-                <span class="badge">Body</span>
-            </h2>
+            <h2>Physique Standards</h2>
             <div class="row">
-                <div>
+                <div class="field">
                     <label for="heightInput">Height (cm or in)</label>
-                    <input type="number" id="heightInput" placeholder="e.g. 178" step="0.1" min="0" inputmode="decimal" />
+                    <input type="number" id="heightInput" placeholder="e.g. 178" step="0.1" min="0" inputmode="decimal">
                 </div>
-                <div>
+                <div class="field">
                     <label for="waistInput">Waist</label>
-                    <input type="number" id="waistInput" placeholder="Same unit as height" step="0.1" min="0" inputmode="decimal" />
+                    <input type="number" id="waistInput" placeholder="Same unit as height" step="0.1" min="0" inputmode="decimal">
                 </div>
             </div>
             <div class="row">
-                <div>
+                <div class="field">
                     <label for="chestInput">Chest</label>
-                    <input type="number" id="chestInput" placeholder="Same unit as waist" step="0.1" min="0" inputmode="decimal" />
+                    <input type="number" id="chestInput" placeholder="Same unit as waist" step="0.1" min="0" inputmode="decimal">
                 </div>
-                <div>
+                <div class="field">
                     <label for="armsInput">Arms (cold, flexed)</label>
-                    <input type="number" id="armsInput" placeholder="Same unit as waist" step="0.1" min="0" inputmode="decimal" />
+                    <input type="number" id="armsInput" placeholder="Same unit as waist" step="0.1" min="0" inputmode="decimal">
                 </div>
             </div>
-            <button class="btn-main" id="evaluateBodyBtn">Evaluate Physique Standards</button>
-
-            <div id="bodyStandardsResult" class="empty-note">
-                Fill the measurements and tap <strong>Evaluate</strong> to see where you stand.
+            <button id="evaluateBodyBtn" class="btn-main">Evaluate Physique Standards</button>
+            <div id="bodyStandardsResult" class="standards-output">
+                Fill your measurements and tap <strong>Evaluate</strong>.
             </div>
         </div>
 
-        <!-- Strength standards -->
-        <div class="card" style="margin-top:14px;">
-            <h2>
-                Strength Standards
-                <span class="badge">Lifts (5 reps)</span>
-            </h2>
-
+        <!-- Strength Standards -->
+        <div class="card">
+            <h2>Strength Standards (5 reps)</h2>
             <div class="row">
-                <div>
+                <div class="field">
                     <label for="stdBW">Bodyweight</label>
-                    <input type="number" id="stdBW" placeholder="kg or lb (matches unit toggle)" step="0.5" min="0" inputmode="decimal" />
+                    <input type="number" id="stdBW" placeholder="kg or lb (matches unit)" step="0.5" min="0" inputmode="decimal">
                 </div>
-                <div>
+                <div class="field">
                     <label for="stdIncline">Incline Bench 5RM</label>
-                    <input type="number" id="stdIncline" placeholder="e.g. 100" step="0.5" min="0" inputmode="decimal" />
+                    <input type="number" id="stdIncline" placeholder="e.g. 100" step="0.5" min="0" inputmode="decimal">
                 </div>
             </div>
-
             <div class="row">
-                <div>
-                    <label for="stdChins">Weighted Chins 5RM (added weight)</label>
-                    <input type="number" id="stdChins" placeholder="e.g. 30" step="0.5" min="0" inputmode="decimal" />
+                <div class="field">
+                    <label for="stdChins">Weighted Chins 5RM (+weight)</label>
+                    <input type="number" id="stdChins" placeholder="e.g. 30" step="0.5" min="0" inputmode="decimal">
                 </div>
-                <div>
+                <div class="field">
                     <label for="stdOHP">Overhead Press 5RM</label>
-                    <input type="number" id="stdOHP" placeholder="e.g. 60" step="0.5" min="0" inputmode="decimal" />
+                    <input type="number" id="stdOHP" placeholder="e.g. 60" step="0.5" min="0" inputmode="decimal">
                 </div>
             </div>
-
             <div class="row">
-                <div>
+                <div class="field">
                     <label for="stdCurl">Barbell Curl 5RM</label>
-                    <input type="number" id="stdCurl" placeholder="e.g. 40" step="0.5" min="0" inputmode="decimal" />
+                    <input type="number" id="stdCurl" placeholder="e.g. 40" step="0.5" min="0" inputmode="decimal">
                 </div>
             </div>
-
-            <button class="btn-main" id="evaluateStrengthBtn">Evaluate Strength Standards</button>
-
-            <div id="strengthStandardsResult" class="empty-note">
-                Enter bodyweight and lifts, then tap <strong>Evaluate</strong>.
+            <button id="evaluateStrengthBtn" class="btn-main">Evaluate Strength Standards</button>
+            <div id="strengthStandardsResult" class="standards-output">
+                Enter your bodyweight and lifts, then tap <strong>Evaluate</strong>.
             </div>
         </div>
 
-        <!-- Warm-up calculator -->
-        <div class="grid" style="margin-top:14px;">
+        <!-- Warm-up & Plate Calculator -->
+        <div class="grid">
             <div class="card">
-                <h2>
-                    Warm-Up Calculator
-                    <span class="badge">Sets & Plates</span>
-                </h2>
-
+                <h2>Warm-up Calculator</h2>
                 <label for="liftSelect">Lift</label>
                 <select id="liftSelect">
-                    <option value="bench">Bench Press</option>
                     <option value="incline_bench">Incline Barbell Bench Press</option>
                     <option value="flat_bench">Flat Barbell Bench Press</option>
                     <option value="squat">Barbell Back Squat</option>
@@ -146,54 +131,36 @@
                     <option value="rdl">Romanian Deadlift</option>
                     <option value="ohp">Overhead Press</option>
                     <option value="row">Bent-Over Barbell Row</option>
+                    <option value="weighted_dips">Weighted Dips</option>
                     <option value="pullups">Weighted Pull-Ups</option>
-                    <option value="weighted_dips">Weighted Dips (Chest-focused)</option>
-                    <option value="lat_raise">Dumbbell Lateral Raises</option>
-                    <option value="triceps_pushdown">Rope Triceps Pushdown</option>
-                    <option value="skull_crushers">Skull Crushers</option>
-                    <option value="ham_curl">Hamstring Curl (Machine)</option>
-                    <option value="calf_raises">Calf Raises</option>
-                    <option value="leg_press">Leg Press (Optional)</option>
-                    <option value="hack_squat">Hack Squat (Optional)</option>
                     <option value="biceps_curl">Barbell Biceps Curl</option>
-                    <option value="rear_delt">Rear Delt Flys</option>
-                    <option value="shrugs">Barbell Shrugs</option>
                     <option value="custom">Custom / Other</option>
                 </select>
 
                 <div class="row">
-                    <div>
+                    <div class="field">
                         <label for="workingWeight">Working Set Weight</label>
-                        <input type="number" id="workingWeight" placeholder="e.g. 100" step="0.5" min="0" inputmode="decimal" />
+                        <input type="number" id="workingWeight" placeholder="e.g. 100" step="0.5" min="0" inputmode="decimal">
                     </div>
-                    <div>
+                    <div class="field">
                         <label for="barWeight">Bar Weight</label>
-                        <input type="number" id="barWeight" placeholder="20 for kg / 45 for lb" step="0.5" min="0" inputmode="decimal" />
+                        <input type="number" id="barWeight" placeholder="20 for kg / 45 for lb" step="0.5" min="0" inputmode="decimal">
                     </div>
                 </div>
 
-                <div class="row">
-                    <div>
-                        <label for="templateSelect">Warm-Up Template</label>
-                        <select id="templateSelect">
-                            <option value="soviet">Soviet Strength</option>
-                            <option value="mentzer">Mike Mentzer</option>
-                            <option value="olympus">Olympus Method</option>
-                        </select>
-                    </div>
-                </div>
+                <label for="templateSelect">Warm-up Template</label>
+                <select id="templateSelect">
+                    <option value="soviet">Soviet Strength</option>
+                    <option value="mentzer">Mike Mentzer</option>
+                    <option value="olympus">Olympus Method</option>
+                </select>
+                <div id="templateHint" class="template-hint"></div>
 
-                <div class="template-hint" id="templateHint"></div>
-
-                <button class="btn-main" id="calcBtn">Calculate Warm-Ups & Plates</button>
+                <button id="calcBtn" class="btn-main">Calculate Warm-ups & Plates</button>
             </div>
 
             <div class="card">
-                <h2>
-                    Warm-Ups & Plates
-                    <span class="badge">Output</span>
-                </h2>
-
+                <h2>Warm-ups & Plates Output</h2>
                 <table class="sets-table" id="resultsTable" style="display:none;">
                     <thead>
                         <tr>
@@ -207,31 +174,29 @@
                     </thead>
                     <tbody id="resultsBody"></tbody>
                 </table>
-
-                <div class="empty-note" id="emptyNote">
-                    Enter working weight & bar, choose your template, then tap <strong>Calculate</strong>.
+                <div id="emptyNote" class="empty-note">
+                    Enter working weight & bar, choose a template, then tap <strong>Calculate</strong>.
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- TAB 2: PUSH -->
+    <!-- TAB: DAY 1 PUSH -->
     <section id="tab-push" class="tab-panel">
         <div class="card">
-            <h2>
-                Day 1 — Push
-                <span class="badge">Chest / Shoulders / Triceps</span>
-            </h2>
+            <h2>Day 1 — Push <span class="badge">Chest / Shoulders / Triceps</span></h2>
 
-            <label class="subsection-title" style="margin-top:10px;">Workout Date</label>
-            <input type="date" class="workout-date" data-day="push" />
+            <div class="field">
+                <label>Workout Date</label>
+                <input type="date" class="workout-date" data-day="push">
+            </div>
 
-            <p class="subsection-title" style="margin-top:10px;">Exercises</p>
+            <p class="subsection-title">Exercises</p>
             <div class="exercise-list" id="pushExercises"></div>
 
             <div class="add-exercise-inline">
                 <input type="text" id="pushAddInput" placeholder="Add exercise..." />
-                <button type="button" class="btn-ghost" data-day="push" id="pushAddBtn">+ Add</button>
+                <button type="button" class="btn-ghost" id="pushAddBtn">+ Add</button>
             </div>
 
             <div class="day-save-row">
@@ -240,23 +205,22 @@
         </div>
     </section>
 
-    <!-- TAB 3: LEGS -->
+    <!-- TAB: DAY 2 LEGS -->
     <section id="tab-legs" class="tab-panel">
         <div class="card">
-            <h2>
-                Day 2 — Legs
-                <span class="badge">Quads / Hams / Calves</span>
-            </h2>
+            <h2>Day 2 — Legs <span class="badge">Quads / Hams / Calves</span></h2>
 
-            <label class="subsection-title" style="margin-top:10px;">Workout Date</label>
-            <input type="date" class="workout-date" data-day="legs" />
+            <div class="field">
+                <label>Workout Date</label>
+                <input type="date" class="workout-date" data-day="legs">
+            </div>
 
-            <p class="subsection-title" style="margin-top:10px;">Exercises</p>
+            <p class="subsection-title">Exercises</p>
             <div class="exercise-list" id="legsExercises"></div>
 
             <div class="add-exercise-inline">
                 <input type="text" id="legsAddInput" placeholder="Add exercise..." />
-                <button type="button" class="btn-ghost" data-day="legs" id="legsAddBtn">+ Add</button>
+                <button type="button" class="btn-ghost" id="legsAddBtn">+ Add</button>
             </div>
 
             <div class="day-save-row">
@@ -265,23 +229,22 @@
         </div>
     </section>
 
-    <!-- TAB 4: PULL -->
+    <!-- TAB: DAY 3 PULL -->
     <section id="tab-pull" class="tab-panel">
         <div class="card">
-            <h2>
-                Day 3 — Pull
-                <span class="badge">Back / Rear Delts / Biceps</span>
-            </h2>
+            <h2>Day 3 — Pull <span class="badge">Back / Rear Delts / Biceps</span></h2>
 
-            <label class="subsection-title" style="margin-top:10px;">Workout Date</label>
-            <input type="date" class="workout-date" data-day="pull" />
+            <div class="field">
+                <label>Workout Date</label>
+                <input type="date" class="workout-date" data-day="pull">
+            </div>
 
-            <p class="subsection-title" style="margin-top:10px;">Exercises</p>
+            <p class="subsection-title">Exercises</p>
             <div class="exercise-list" id="pullExercises"></div>
 
             <div class="add-exercise-inline">
                 <input type="text" id="pullAddInput" placeholder="Add exercise..." />
-                <button type="button" class="btn-ghost" data-day="pull" id="pullAddBtn">+ Add</button>
+                <button type="button" class="btn-ghost" id="pullAddBtn">+ Add</button>
             </div>
 
             <div class="day-save-row">
@@ -291,24 +254,23 @@
     </section>
 
     <!-- TIMER FOOTER -->
-    <div class="timer-footer collapsed" id="timerFooter">
-        <div class="timer-summary">
+    <div class="timer-footer" id="timerFooter">
+        <div class="timer-summary" id="timerSummary">
             <div class="timer-summary-main">
-                <div><span class="label">Workout</span> <span class="value" id="workoutSummary">00:00</span></div>
-                <div><span class="label">Rest</span> <span class="value" id="restSummary">00s</span></div>
+                <span>Workout: <span id="workoutSummary">00:00</span></span>
+                <span>Rest: <span id="restSummary">00s</span></span>
             </div>
-            <div class="timer-chevron" id="timerChevron">▲</div>
+            <button class="timer-toggle" id="timerToggleBtn">Details</button>
         </div>
-        <div class="timer-expanded">
+        <div class="timer-expanded" id="timerDetails">
             <div class="timer-block">
                 <div class="timer-label">Workout Timer</div>
                 <div class="timer-display" id="workoutDisplay">00:00</div>
                 <div class="timer-controls">
-                    <button class="timer-btn primary" id="workoutStartPause">Start</button>
+                    <button class="timer-btn" id="workoutStartPause">Start</button>
                     <button class="timer-btn" id="workoutReset">Reset</button>
                 </div>
             </div>
-
             <div class="timer-block">
                 <div class="timer-label">Rest Timer</div>
                 <div class="timer-display" id="restDisplay">00s</div>
@@ -318,7 +280,7 @@
                     <button class="timer-btn rest-preset" data-sec="300">5 min</button>
                 </div>
                 <div class="timer-controls">
-                    <button class="timer-btn primary" id="restStartPause">Start</button>
+                    <button class="timer-btn" id="restStartPause">Start</button>
                     <button class="timer-btn" id="restReset">Reset</button>
                     <button class="timer-btn" id="restPlus30">+30s</button>
                 </div>
@@ -326,8 +288,5 @@
         </div>
     </div>
 </div>
-
-<!-- External JS -->
-<script src="app.js?v=2"></script>
 </body>
 </html>
